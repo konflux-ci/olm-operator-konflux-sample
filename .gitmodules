@@ -1,0 +1,6 @@
+[submodule "gatekeeper-operator"]
+	path = gatekeeper-operator
+	url = https://github.com/stolostron/gatekeeper-operator.git
+[submodule "gatekeeper"]
+	path = gatekeeper
+	url = https://github.com/stolostron/gatekeeper.git
