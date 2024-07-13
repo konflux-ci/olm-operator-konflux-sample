@@ -10,7 +10,7 @@ COPY gatekeeper .
 
 RUN go build -mod vendor -a -ldflags "${LDFLAGS}" -o manager
 
-FROM registry.access.redhat.com/ubi9/ubi-micro:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 WORKDIR /
 COPY --from=builder /go/src/github.com/open-policy-agent/gatekeeper/manager .
 RUN microdnf -y update && microdnf -y clean all
