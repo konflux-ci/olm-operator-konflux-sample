@@ -116,7 +116,7 @@ spec:
         - name: name
           value: source-build-oci-ta
         - name: bundle
-          value: quay.io/redhat-appstudio-tekton-catalog/task-source-build-oci-ta:0.1@sha256:d6e92bd97844fef4c4edf529248fa3cbc61a45a9df77a413b52e5521fe3b7498
+          value: quay.io/redhat-appstudio-tekton-catalog/task-source-build-oci-ta:0.1@sha256:b133f5a2c36870048d1be80bdf6d8b5311790e960759ae7403657529ccc2049a
         - name: kind
           value: task
       when:
