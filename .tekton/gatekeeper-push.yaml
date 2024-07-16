@@ -28,14 +28,15 @@ spec:
     value: quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper:{{revision}}
   - name: dockerfile
     value: Containerfile.gatekeeper
-  - name: enable-amd64-build
-    value: "false"
-  - name: enable-arm64-build
-    value: "false"
-  - name: enable-ppc64le-build
-    value: "false"
-  - name: enable-s390x-build
-    value: "true"
+  # We need matrix builds in order to use these parameters: https://issues.redhat.com/browse/EC-654
+  # - name: enable-amd64-build
+  #   value: "true"
+  # - name: enable-arm64-build
+  #   value: "true"
+  # - name: enable-ppc64le-build
+  #   value: "true"
+  # - name: enable-s390x-build
+  #   value: "true"
   pipelineRef:
     name: multi-arch-build-pipeline
   workspaces:
