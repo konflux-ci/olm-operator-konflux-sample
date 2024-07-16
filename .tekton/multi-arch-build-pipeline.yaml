@@ -276,10 +276,10 @@ spec:
             value: task
         resolver: bundles
       when:
-        - input: $(tasks.init.results.build)
+        - input: "$(tasks.init.results.build)"
           operator: in
           values:
-            - "true"
+          - 'true'
     - name: build-source-image
       taskRef:
         resolver: bundles
@@ -516,15 +516,15 @@ spec:
     - name: enable-arm64-build
       type: string
       description: Enable arm64 builds 
-      default: "false"
+      default: "true"
     - name: enable-ppc64le-build
       type: string
       description: Enable ppc64le builds 
-      default: "false"
+      default: "true"
     - name: enable-s390x-build
       type: string
       description: Enable s390x builds 
-      default: "false"
+      default: "true"
     - name: amd64-platform
       type: string
       description: Enable the amd64 platform to be changed from the PipelineRun file
