@@ -35,7 +35,7 @@ After merging the initial Tekton PipelineRuns to the repository, the structure o
 
 More information on the specifics for these customizations can be found [below](#functionality-demonstrated-in-this-repository).
 
-This [overhaul PR](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/4) was also merged before 
+NOTE: The multi-arch builds were not properly building the index image until [all architectures](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/15) were enabled.
 
 ### Add more Components as necessary
 
