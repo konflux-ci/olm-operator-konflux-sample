@@ -1,6 +1,8 @@
 [submodule "gatekeeper-operator"]
 	path = gatekeeper-operator
 	url = https://github.com/stolostron/gatekeeper-operator.git
+	branch = release-3.15
 [submodule "gatekeeper"]
 	path = gatekeeper
 	url = https://github.com/stolostron/gatekeeper.git
+	branch = release-3.15
