@@ -47,6 +47,12 @@ If all of your components are not building properly when you onboard new compone
 
 Konflux leverages [Enterprise Contract](https://enterprisecontract.dev/) for verifying that artifacts comply with a specific set of policies. One of the policies that can be configured ensures that the task bundle reference is the [latest version available](https://enterprisecontract.dev/docs/ec-policies/release_policy.html#attestation_task_bundle__task_ref_bundles_current). In order to ensure that this policy does not fail, task updates proposed by Konflux need to be merged within 30 days. This task data is contained in the [data-acceptable-bundles](quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest) OCI artifact.
 
+## Add component nudge relationships
+
+In order to ensure that the bundle image is always up to date with the latest gatekeeper and gatekeeper-operator images, we need to configure [component nudges](https://konflux-ci.dev/docs/how-tos/configuring/component-nudges/). First, the Components were modified [via ArgoCD](https://github.com/redhat-appstudio/tenants-config/pull/498) and then we had to configure the push pipelines to indicate which files need to have the pullspecs updated in.
+
+We prepared for these nudges by reworking how the bundles [are built](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/16). In that PR, we ensured that we have the full pullspec (and digest) of the nudging components' images in a file. This process enables us to easily modify and update the ClusterServiceVersion in the bundle image. While it is possible to update the image pullspecs directly in the bundle as well, it was separated out here to specifically enable additional customizations on top of the `operator-sdk` tooling to build the bundle.
+
 # Functionality demonstrated in this repository
 
 While it is possible to limit the konflux-sample repositories to only illustrate a specific functionality or tip, many different changes are leveraged in this repository in order to improve the comprehension and maintenance of the repository. The key customizations and changes made are:
@@ -102,3 +108,7 @@ After properly configuring the cel expressions, a PR which updates content that 
 This indicates that the PipelineRun will only be executed if the event is a PR to the main branch and if on of the 5 specified files were included in the changeset. Documentation for filtering events can be found in [Pipelines as Code](https://pipelinesascode.com/docs/guide/authoringprs/#advanced-event-matching).
 
 While this results in improved resource utilization (lower cloud spend), it does mean that not all artifacts will be built from every commit. If you need to identify the specific commit which produced an artifact, you can query the artifact's attestations for the [build parameters](https://konflux-ci.dev/docs/how-tos/metadata/attestations/#identify-the-build-parameters).
+
+## Customization of files for component nudging
+
+The gatekeeper and gatekeeper operator's "push" pipelines both specify the file to nudge component references in via the `build.appstudio.openshift.io/build-nudge-files` annotation. Since the location of the component references is atypical (i.e. not a Containerfile or yaml file), we need to configure this annotation.
