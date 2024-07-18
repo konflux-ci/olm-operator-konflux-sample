@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export GATEKEEPER_GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:230ac0a06e8d6c298c522d745bd1f8ebcf47e1210c90157ddb033731fad2524c"
+export GATEKEEPER_GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:469c229f9641a64070b7f17f9d2ab8c543bbf5c1ffd756703d78c8805461e5ba"
 export GATEKEEPER_OPERATOR_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator@sha256:53656fb50bb827b09243ec8c04b38af2a1505cf5c21d4dcf5a287b41a42803f4"
 
 export CSV_FILE=/manifests/gatekeeper-operator.clusterserviceversion.yaml
