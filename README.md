@@ -111,4 +111,4 @@ While this results in improved resource utilization (lower cloud spend), it does
 
 ## Customization of files for component nudging
 
-The gatekeeper and gatekeeper operator's "push" pipelines both specify the file to nudge component references in via the `build.appstudio.openshift.io/build-nudge-files` annotation. Since the location of the component references is atypical (i.e. not a Containerfile or yaml file), we need to configure this annotation.
+The gatekeeper and gatekeeper operator's "push" pipelines both specify the file to nudge component references in via the `build.appstudio.openshift.io/build-nudge-files` annotation. Since the location of the component references is atypical (i.e. not a Containerfile or yaml file), we need to configure this annotation. Once this annotation is set, the newly built operand and operator images will trigger a pull request against the `update_bundle.sh` file (i.e. konflux-ci/olm-operator-konflux-sample#21 and konflux-ci/olm-operator-konflux-sample#22).
