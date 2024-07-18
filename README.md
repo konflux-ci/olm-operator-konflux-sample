@@ -1,6 +1,6 @@
 # OLM operator Konflux sample
 
-It is possible to [build OLM operators in Konflux](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/). This repository is dedicated to demonstrating how to build operators with a simple example.
+It is possible to [build Operator Lifecyle Manager (OLM) operators in Konflux](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/). This repository is dedicated to demonstrating how to build operators with a simple example.
 
 ## Repository layout
 
