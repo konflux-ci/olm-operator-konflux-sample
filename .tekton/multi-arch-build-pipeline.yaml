@@ -509,6 +509,7 @@ spec:
       type: string
       description: Path to a file with build arguments, see https://www.mankier.com/1/buildah-build#--build-arg-file
       default: ""
+    # We need matrix builds in order to use these "enable architecture" parameters: https://issues.redhat.com/browse/EC-654
     - name: enable-amd64-build
       type: string
       description: Enable amd64 builds 
