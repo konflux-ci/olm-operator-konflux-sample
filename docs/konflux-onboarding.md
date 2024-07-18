@@ -37,7 +37,7 @@ We onboarded the bundle component after the first two components were built. The
 
 If all of your components are not building properly when you onboard new components, you may see some failures in the onboarding PR. For example, we saw a failure in the [onboarding PR](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/5) due to another component being built. That issue was being worked on in [another PR in parallel](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/4) and had not yet been merged. Another case where the PRs can indicate failure from other components is if the IntegrationTestScenarios (ITS) are reporting an error. Since the ITS is run against a snapshot of all components in an application, a failure in one (for example an enterprise contract violation) will report back on a PR for any component in the application. If you do not want to override the CI failures to merge, then you will need to ensure that the base reference is properly building before onboarding a new component.
 
-When adding the bundle image, you will need to establish a process for maintianing the ClusterServiceVersion. This includes ensuring that `spec.relatedImages` is complete with all sha digest references for all images that may be required to install the operator which enables the images to be mirrored for a disconnected installation of the operator. You can either do this manually, with your own script, or with a tool like [operator-manifest](https://github.com/containerbuildsystem/operator-manifest#pull-specifications).
+When adding the bundle image, you will need to establish a process for maintianing the ClusterServiceVersion. This includes ensuring that `spec.relatedImages` is complete with all sha digest references for all images that may be required to install the operator which enables the images to be mirrored for a disconnected installation of the operator. You can either do this manually, with your own script, or with a tool like [operator-manifest-tools](https://github.com/operator-framework/operator-manifest-tools/blob/main/docs/operator-manifest-tools_pinning_replace.md) or[operator-manifest](https://github.com/containerbuildsystem/operator-manifest#pull-specifications).
 
 ## Maintain the pipeline task references
 
@@ -48,3 +48,19 @@ Konflux leverages [Enterprise Contract](https://enterprisecontract.dev/) for ver
 In order to ensure that the bundle image is always up to date with the latest gatekeeper and gatekeeper-operator images, we need to configure [component nudges](https://konflux-ci.dev/docs/how-tos/configuring/component-nudges/). First, the Components were modified [via ArgoCD](https://github.com/redhat-appstudio/tenants-config/pull/498) and then we had to configure the push pipelines to indicate which files need to have the pullspecs updated in.
 
 We prepared for these nudges by reworking how the bundles [are built](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/16). In that PR, we ensured that we have the full pullspec (and digest) of the nudging components' images in a file. This process enables us to easily modify and update the ClusterServiceVersion in the bundle image. While it is possible to update the image pullspecs directly in the bundle as well, it was separated out here to specifically enable additional customizations on top of the `operator-sdk` tooling to build the bundle.
+
+## Building a file-based catalog
+
+An OLM catalog describes the operators that are available for installation, their dependencies, and their upgrade compatibility. [File-based catalogs (FBC)s](https://olm.operatorframework.io/docs/reference/file-based-catalogs/) are the latest iteration of OLM's catalog format.
+
+FBC components and their validation are uniquely different from that of normal container images, so a [dedicated pipeline](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/#building-the-file-based-catalog) is provided with appropriate build-time checks. While operators and their bundles can often be supported on multiple platform (for example Red Hat OpenShift) versions, separate catalogs will often be generated for each platform version. Since there are often multiple streams/versions of bundle images that need to be referenced in the FBC components, it will likely be beneficial to isolate all FBC components in their own application. In this sample repository, however, we will include it in the same application as we will only illustrate generating a FBC for a single version of Red Hat OpenShift.
+
+### Create the FBC in the git repository
+
+*While it is possible to create and manage the git repository today, we are actively working with the OLM team to make it even easier to migrate from a current catalog and to maintain the catalog with FBC in Konflux. Please check back soon!*
+
+### Onboard the FBC to Konflux
+
+Once the git repository is configured with the expanded catalog committed to the repository, you just need to onboard the component with the dedicated FBC pipeline.
+
+If you want to test the catalog on multiple architectures, you will need to generate the catalog with a multi-arch pipeline.
