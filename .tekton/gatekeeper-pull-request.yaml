@@ -11,6 +11,7 @@ metadata:
       (".tekton/multi-arch-build-pipeline.yaml".pathChanged() || 
       ".tekton/gatekeeper-pull-request.yaml".pathChanged() || 
       ".tekton/gatekeeper-push.yaml".pathChanged() ||
+      "Containerfile.gatekeeper".pathChanged() ||
       "gatekeeper".pathChanged())
   creationTimestamp: null
   labels:
@@ -31,6 +32,9 @@ spec:
     value: 5d
   - name: dockerfile
     value: Containerfile.gatekeeper
+  # - name: buildah-platforms
+  #   value:
+  #   - invalid
   # We need matrix builds in order to use these parameters: https://issues.redhat.com/browse/EC-654
   # - name: enable-amd64-build
   #   value: "true"

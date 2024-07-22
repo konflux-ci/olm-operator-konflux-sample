@@ -73,33 +73,11 @@ spec:
         value: $(params.output-image).prefetch
       - name: ociArtifactExpiresAfter
         value: $(params.image-expires-after)
-    - name: build-containers
+    - name: build-containers-multi-platform
       matrix:
-        include:
-          - name: amd64
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-amd64
-              - name: PLATFORM
-                value: linux/amd64
-          - name: arm64
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-arm64
-              - name: PLATFORM
-                value: linux/arm64
-          - name: ppc64le
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-ppc64le
-              - name: PLATFORM
-                value: linux/ppc64le
-          - name: s390x
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-s390x
-              - name: PLATFORM
-                value: linux/s390x
+        params:
+          - name: PLATFORM
+            value: $(params.buildah-platforms)
       taskRef:
         resolver: bundles
         params:
@@ -107,7 +85,7 @@ spec:
           value: buildah-remote-oci-ta
         - name: bundle
           # value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:ddd3835a371c23a9fb4f463b276372347a35919919604c76827dc5eb2f6146c4
-          value: quay.io/konflux-ci/pull-request-builds:buildah-remote-oci-ta-0.2-cecc219d1e73e391bc1d8fcb4114626a23ca93f6
+          value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:8560766bdf9bbfd074b9d9430028f5b02f3c78f391cd60304e151d1cd2f56ab9
         - name: kind
           value: task
       runAfter:
@@ -118,6 +96,8 @@ spec:
         values:
         - 'true'
       params:
+      - name: IMAGE
+        value: $(params.output-image)
       - name: DOCKERFILE
         value: "$(params.dockerfile)"
       - name: CONTEXT
@@ -144,15 +124,16 @@ spec:
           value: $(tasks.clone-repository.results.commit)
         - name: IMAGES
           value:
-            - $(tasks.build-containers.results.IMAGE_REF[*])
+            - $(tasks.build-containers-multi-platform.results.IMAGE_REF[*])
       runAfter:
-        - build-containers
+        - build-containers-multi-platform
       taskRef:
         params:
           - name: name
             value: build-image-manifest
           - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-build-image-manifest:0.1@sha256:231b521c5443a750cfcb302b74633ebe140b5ab0333688c91d32745417cc23a3
+            # value: quay.io/konflux-ci/tekton-catalog/task-build-image-manifest:0.1@sha256:231b521c5443a750cfcb302b74633ebe140b5ab0333688c91d32745417cc23a3
+            value: quay.io/arewm/build-image-manifest@sha256:64267fff3bf7ec4bea5735e53bb94401b0e15d8329ad3e4319249555cefc6559
           - name: kind
             value: task
         resolver: bundles
@@ -269,10 +250,14 @@ spec:
         values:
         - 'false'
       runAfter:
-      - clone-repository
+      - build-image-index
       params:
       - name: SOURCE_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+      - name: image-digest
+        value: "$(tasks.build-image-index.results.IMAGE_DIGEST)"
+      - name: image-url
+        value: "$(tasks.build-image-index.results.IMAGE_URL)"
     - name: clamav-scan
       taskRef:
         resolver: bundles
@@ -388,39 +373,11 @@ spec:
       type: string
       description: Path to a file with build arguments, see https://www.mankier.com/1/buildah-build#--build-arg-file
       default: ""
-    # We need matrix builds in order to use these "enable architecture" parameters: https://issues.redhat.com/browse/EC-654
-    - name: enable-amd64-build
-      type: string
-      description: Enable amd64 builds 
-      default: "true"
-    - name: enable-arm64-build
-      type: string
-      description: Enable arm64 builds 
-      default: "true"
-    - name: enable-ppc64le-build
-      type: string
-      description: Enable ppc64le builds 
-      default: "true"
-    - name: enable-s390x-build
-      type: string
-      description: Enable s390x builds 
-      default: "true"
-    - name: amd64-platform
-      type: string
-      description: Enable the amd64 platform to be changed from the PipelineRun file
-      default: linux/amd64
-    - name: arm64-platform
-      type: string
-      description: Enable the arm64 platform to be changed from the PipelineRun file
-      default: linux/arm64
-    - name: ppc64le-platform
-      type: string
-      description: Enable the ppc64le platform to be changed from the PipelineRun file
-      default: linux/ppc64le
-    - name: s390x-platform
-      type: string
-      description: Enable the s390x platform to be changed from the PipelineRun file
-      default: linux/s390x
+    - name: buildah-platforms
+      type: array
+      description: List of platforms to run builds on. Valid options depend on the configured remote platforms for the multi-platform controller.
+      default:
+      - linux/amd64
     workspaces:
     - name: git-auth
       optional: true
@@ -439,7 +396,7 @@ spec:
       value: "$(tasks.clone-repository.results.commit)"
     - name: JAVA_COMMUNITY_DEPENDENCIES
       description: ''
-      value: "$(tasks.build-containers.results.JAVA_COMMUNITY_DEPENDENCIES[0])"
+      value: "$(tasks.build-containers-multi-platform.results.JAVA_COMMUNITY_DEPENDENCIES[0])"
     finally:
     - name: show-sbom
       taskRef:
