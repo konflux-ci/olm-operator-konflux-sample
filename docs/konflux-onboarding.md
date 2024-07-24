@@ -1,6 +1,6 @@
 # Onboarding process for Konflux
 
-In order to increase transparency into the process of onboarding, we will document the steps taken in order to enable better reproducibility.
+In order to increase transparency into the [process of onboarding](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/), we will document the steps taken in order to enable better reproducibility.
 
 ## Prepare the git repository (optional)
 
@@ -11,6 +11,8 @@ In this repository, we used git submodules to [pull together multiple remote ref
 ## Onboard component(s) to Konflux
 
 After you have your git repository, the first step that is required is to create an application and onboard your component(s). This process can be done in either the UI or using a GitOps approach. While the initial component onboarding was performed using the UI for this sample, the CRs have also been defined via [GitOps after the fact](https://github.com/redhat-appstudio/tenants-config/pull/482).
+
+**NOTE:** If you have a custom Enterprise Contract policy that will be used for releasing, it will be beneficial to [configure it](https://konflux-ci.dev/docs/how-tos/testing/integration/editing/#configuring-the-enterprise-contract-policy) after the first component is onboarded (for example, before the tekton pipeline definitions are merged). This will enable you to ensure that each artifact is meeting the policy as it is getting onboarded.
 
 ### Merge tekton pipleine definitions
 
@@ -59,8 +61,21 @@ FBC components and their validation are uniquely different from that of normal c
 
 *While it is possible to create and manage the git repository today, we are actively working with the OLM team to make it even easier to migrate from a current catalog and to maintain the catalog with FBC in Konflux. Please check back soon!*
 
+In the meantime, some other individuals have built some tools to make it easier to onboard to and manage FBC configuration:
+
+* https://github.com/ASzc/fbc-utils
+
+**NOTE:** The file-based catalogs should be nested with `/configs` in a directory which matches the package name. This ensures that the catalogs for separate packages are easily distinguishable.
+
+```
+$ tree configs
+configs
+└── package-name
+    └── catalog.json
+```
+
 ### Onboard the FBC to Konflux
 
-Once the git repository is configured with the expanded catalog committed to the repository, you just need to onboard the component with the dedicated FBC pipeline.
+Once the git repository is configured with the expanded catalog committed to the repository, you need to [onboard the component](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/#building-the-file-based-catalog) with the dedicated FBC pipeline.
 
 If you want to test the catalog on multiple architectures, you will need to generate the catalog with a multi-arch pipeline.
