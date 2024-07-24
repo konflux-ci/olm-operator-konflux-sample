@@ -11,6 +11,7 @@ metadata:
       (".tekton/multi-arch-build-pipeline.yaml".pathChanged() || 
       ".tekton/gatekeeper-pull-request.yaml".pathChanged() || 
       ".tekton/gatekeeper-push.yaml".pathChanged() ||
+      "Containerfile.gatekeeper".pathChanged() ||
       "gatekeeper".pathChanged())
   creationTimestamp: null
   labels:
