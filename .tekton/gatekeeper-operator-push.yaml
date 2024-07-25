@@ -30,6 +30,11 @@ spec:
     value: quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator:{{revision}}
   - name: dockerfile
     value: Containerfile.gatekeeper-operator
+  - name: enabled-platforms
+    value:
+      - linux/amd64
+      - linux/arm64
+      - linux/s390x
   pipelineRef:
     name: multi-arch-build-pipeline
   workspaces:

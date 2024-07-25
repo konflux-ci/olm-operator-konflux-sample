@@ -90,6 +90,9 @@ spec:
         operator: in
         values:
         - 'true'
+      - input: "linux/amd64"
+        operator: in
+        values: ["$(params.enabled-platforms[*])"]
       params:
       - name: IMAGE
         value: $(params.output-image)-amd64
@@ -148,6 +151,10 @@ spec:
         operator: in
         values:
         - 'true'
+      # validation failed: non-existent variable in "$(params.PLATFORM)": spec[4].when[1].input
+      # - input: "$(params.PLATFORM)"
+      #   operator: in
+      #   values: ["$(params.enabled-platforms[*])"]
       params:
       - name: DOCKERFILE
         value: "$(params.dockerfile)"
@@ -424,6 +431,11 @@ spec:
       type: string
       description: Path to a file with build arguments, see https://www.mankier.com/1/buildah-build#--build-arg-file
       default: ""
+    - name: enabled-platforms
+      type: array
+      description: List of enabled platforms in the form of os/architecture,
+        e.g. linux/amd64, linux/arm64
+      default: ["linux/amd64"]
     workspaces:
     - name: git-auth
       optional: true
