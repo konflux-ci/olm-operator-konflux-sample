@@ -73,19 +73,85 @@ spec:
         value: $(params.output-image).prefetch
       - name: ociArtifactExpiresAfter
         value: $(params.image-expires-after)
+    - name: build-container-amd64
+      taskRef:
+        resolver: bundles
+        params:
+        - name: name
+          value: buildah-oci-ta
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2@sha256:46c6bf4872647a80aa8375fab221ea4483356da8a43b5f5b0cdc6a4f76fbc95e
+        - name: kind
+          value: task
+      runAfter:
+        - prefetch-dependencies
+      when:
+      - input: "$(tasks.init.results.build)"
+        operator: in
+        values:
+        - 'true'
+      - input: "$(params.build-amd-in-cluster)"
+        operator: in
+        values: ['true']
+      params:
+      - name: IMAGE
+        value: $(params.output-image)-amd64
+      - name: DOCKERFILE
+        value: "$(params.dockerfile)"
+      - name: CONTEXT
+        value: "$(params.path-context)"
+      - name: HERMETIC
+        value: "$(params.hermetic)"
+      - name: PREFETCH_INPUT
+        value: "$(params.prefetch-input)"
+      - name: IMAGE_EXPIRES_AFTER
+        value: "$(params.image-expires-after)"
+      - name: COMMIT_SHA
+        value: "$(tasks.clone-repository.results.commit)"
+      - name: SOURCE_ARTIFACT
+        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+      - name: CACHI2_ARTIFACT
+        value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
+      - name: BUILD_ARGS_FILE
+        value: $(params.build-args-file)
     - name: build-containers-multi-platform
       matrix:
-        params:
-          - name: PLATFORM
-            value: $(params.buildah-platforms)
+        include:
+          # While this is possible to do, we build amd64 in-cluster instead.
+          #  In order to build amd64 remotely, uncomment this and disable
+          #  the in-cluster task by setting params.build-amd-in-cluster to false
+          # - name: amd64
+          #   params:
+          #     - name: IMAGE
+          #       value: $(params.output-image)-amd64
+          #     - name: PLATFORM
+          #       value: $(params.amd64-platform)
+          - name: arm64
+            params:
+              - name: IMAGE
+                value: $(params.output-image)-arm64
+              - name: PLATFORM
+                value: $(params.arm64-platform)
+          - name: ppc64le
+            params:
+              - name: IMAGE
+                value: $(params.output-image)-ppc64le
+              - name: PLATFORM
+                value: $(params.ppc64le-platform)
+          - name: s390x
+            params:
+              - name: IMAGE
+                value: $(params.output-image)-s390x
+              - name: PLATFORM
+                value: $(params.s390x-platform)
       taskRef:
         resolver: bundles
         params:
         - name: name
           value: buildah-remote-oci-ta
         - name: bundle
-          # value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:ddd3835a371c23a9fb4f463b276372347a35919919604c76827dc5eb2f6146c4
-          value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:8560766bdf9bbfd074b9d9430028f5b02f3c78f391cd60304e151d1cd2f56ab9
+          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:ddd3835a371c23a9fb4f463b276372347a35919919604c76827dc5eb2f6146c4
+          # value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:8560766bdf9bbfd074b9d9430028f5b02f3c78f391cd60304e151d1cd2f56ab9
         - name: kind
           value: task
       runAfter:
@@ -125,6 +191,7 @@ spec:
         - name: IMAGES
           value:
             - $(tasks.build-containers-multi-platform.results.IMAGE_REF[*])
+            - $(tasks.build-container-amd64.results.IMAGE_REF)
       runAfter:
         - build-containers-multi-platform
       taskRef:
@@ -132,8 +199,8 @@ spec:
           - name: name
             value: build-image-manifest
           - name: bundle
-            # value: quay.io/konflux-ci/tekton-catalog/task-build-image-manifest:0.1@sha256:231b521c5443a750cfcb302b74633ebe140b5ab0333688c91d32745417cc23a3
-            value: quay.io/arewm/build-image-manifest@sha256:64267fff3bf7ec4bea5735e53bb94401b0e15d8329ad3e4319249555cefc6559
+            value: quay.io/konflux-ci/tekton-catalog/task-build-image-manifest:0.1@sha256:231b521c5443a750cfcb302b74633ebe140b5ab0333688c91d32745417cc23a3
+            # value: quay.io/arewm/build-image-manifest@sha256:64267fff3bf7ec4bea5735e53bb94401b0e15d8329ad3e4319249555cefc6559
           - name: kind
             value: task
         resolver: bundles
@@ -373,11 +440,26 @@ spec:
       type: string
       description: Path to a file with build arguments, see https://www.mankier.com/1/buildah-build#--build-arg-file
       default: ""
-    - name: buildah-platforms
+    - name: build-amd-in-cluster
       type: array
-      description: List of platforms to run builds on. Valid options depend on the configured remote platforms for the multi-platform controller.
-      default:
-      - linux/amd64
+      description: Whether to build amd64 images in-cluster. Set to false if planning to build amd64 remotely.
+      default: 'true'
+    - name: amd64-platform
+      type: string
+      description: Platform to use for amd64 remote builds
+      default: linux/amd64
+    - name: arm64-platform
+      type: string
+      description: Platform to use for arm64 remote builds
+      default: linux/arm64
+    - name: ppc64le-platform
+      type: string
+      description: Platform to use for ppc64le remote builds
+      default: linux/ppc64le
+    - name: s390x-platform
+      type: string
+      description: Platform to use for s390x remote builds
+      default: linux/s390x
     workspaces:
     - name: git-auth
       optional: true

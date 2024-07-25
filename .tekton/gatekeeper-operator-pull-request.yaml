@@ -32,10 +32,6 @@ spec:
     value: 5d
   - name: dockerfile
     value: Containerfile.gatekeeper-operator
-    # - linux/amd64
-    # - linux/arm64
-    # - linux/ppc64le
-    # - linux/s390x
   pipelineRef:
     name: multi-arch-build-pipeline
   workspaces:
