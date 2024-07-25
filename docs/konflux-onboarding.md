@@ -51,6 +51,12 @@ In order to ensure that the bundle image is always up to date with the latest ga
 
 We prepared for these nudges by reworking how the bundles [are built](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/16). In that PR, we ensured that we have the full pullspec (and digest) of the nudging components' images in a file. This process enables us to easily modify and update the ClusterServiceVersion in the bundle image. While it is possible to update the image pullspecs directly in the bundle as well, it was separated out here to specifically enable additional customizations on top of the `operator-sdk` tooling to build the bundle.
 
+## Update references in the bundle to be valid after release
+
+Since bundle images are not rebuilt when they are pushed to another registry, we will need to build the image with references that *will* be valid. It is possible for the component nudge relationships to maintain these references [after configuring a ReleasePlanAdmission](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/#maintaining-valid-image-references-before-a-release).
+
+*Note: This step has not been performed with this sample repository as there is not a publicly configured location to define the ReleasePlanAdmissions*
+
 ## Building a file-based catalog
 
 An OLM catalog describes the operators that are available for installation, their dependencies, and their upgrade compatibility. [File-based catalogs (FBC)s](https://olm.operatorframework.io/docs/reference/file-based-catalogs/) are the latest iteration of OLM's catalog format.
