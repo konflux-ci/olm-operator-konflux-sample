@@ -73,65 +73,11 @@ spec:
         value: $(params.output-image).prefetch
       - name: ociArtifactExpiresAfter
         value: $(params.image-expires-after)
-    - name: build-container-amd64
-      taskRef:
-        resolver: bundles
-        params:
-        - name: name
-          value: buildah-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2@sha256:46c6bf4872647a80aa8375fab221ea4483356da8a43b5f5b0cdc6a4f76fbc95e
-        - name: kind
-          value: task
-      runAfter:
-        - prefetch-dependencies
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: in
-        values:
-        - 'true'
-      params:
-      - name: IMAGE
-        value: $(params.output-image)-amd64
-      - name: DOCKERFILE
-        value: "$(params.dockerfile)"
-      - name: CONTEXT
-        value: "$(params.path-context)"
-      - name: HERMETIC
-        value: "$(params.hermetic)"
-      - name: PREFETCH_INPUT
-        value: "$(params.prefetch-input)"
-      - name: IMAGE_EXPIRES_AFTER
-        value: "$(params.image-expires-after)"
-      - name: COMMIT_SHA
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
-      - name: CACHI2_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
-      - name: BUILD_ARGS_FILE
-        value: $(params.build-args-file)
-    - name: build-containers-multi-platform
+    - name: build-images
       matrix:
-        include:
-          - name: arm64
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-arm64
-              - name: PLATFORM
-                value: linux/arm64
-          - name: ppc64le
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-ppc64le
-              - name: PLATFORM
-                value: linux/ppc64le
-          - name: s390x
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-s390x
-              - name: PLATFORM
-                value: linux/s390x
+        params:
+          - name: PLATFORM
+            value: ["$(params.platforms)"]
       taskRef:
         resolver: bundles
         params:
@@ -153,6 +99,8 @@ spec:
         value: "$(params.dockerfile)"
       - name: CONTEXT
         value: "$(params.path-context)"
+      - name: IMAGE
+        value: "$(params.output-image)"
       - name: HERMETIC
         value: "$(params.hermetic)"
       - name: PREFETCH_INPUT
@@ -175,10 +123,9 @@ spec:
           value: $(tasks.clone-repository.results.commit)
         - name: IMAGES
           value:
-            - $(tasks.build-containers-multi-platform.results.IMAGE_REF[*])
-            - $(tasks.build-container-amd64.results.IMAGE_REF)
+            - $(tasks.build-images.results.IMAGE_REF[*])
       runAfter:
-        - build-containers-multi-platform
+        - build-images
       taskRef:
         params:
           - name: name
@@ -424,6 +371,11 @@ spec:
       type: string
       description: Path to a file with build arguments, see https://www.mankier.com/1/buildah-build#--build-arg-file
       default: ""
+    - name: enabled-platforms
+      type: array
+      description: List of enabled platforms in the form of os/architecture,
+        e.g. linux/amd64, linux/arm64
+      default: ["linux/amd64"]
     workspaces:
     - name: git-auth
       optional: true
@@ -442,7 +394,7 @@ spec:
       value: "$(tasks.clone-repository.results.commit)"
     - name: JAVA_COMMUNITY_DEPENDENCIES
       description: ''
-      value: "$(tasks.build-containers-multi-platform.results.JAVA_COMMUNITY_DEPENDENCIES[0])"
+      value: "$(tasks.build-images.results.JAVA_COMMUNITY_DEPENDENCIES[0])"
     finally:
     - name: show-sbom
       taskRef:
