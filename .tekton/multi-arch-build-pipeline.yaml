@@ -114,7 +114,7 @@ spec:
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
       - name: BUILD_ARGS_FILE
         value: $(params.build-args-file)
-    - name: build-containers-multi-platform
+    - name: build-containers-remote
       matrix:
         include:
           # While this is possible to do, we build amd64 in-cluster instead.
@@ -150,8 +150,7 @@ spec:
         - name: name
           value: buildah-remote-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:ddd3835a371c23a9fb4f463b276372347a35919919604c76827dc5eb2f6146c4
-          # value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:8560766bdf9bbfd074b9d9430028f5b02f3c78f391cd60304e151d1cd2f56ab9
+          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:940d9c1b107fa07c1f75062a102319ee9f75bc1c3e70f739827530290e8c3b1b
         - name: kind
           value: task
       runAfter:
@@ -162,8 +161,6 @@ spec:
         values:
         - 'true'
       params:
-      - name: IMAGE
-        value: $(params.output-image)
       - name: DOCKERFILE
         value: "$(params.dockerfile)"
       - name: CONTEXT
@@ -190,17 +187,16 @@ spec:
           value: $(tasks.clone-repository.results.commit)
         - name: IMAGES
           value:
-            - $(tasks.build-containers-multi-platform.results.IMAGE_REF[*])
-            - $(tasks.build-container-amd64.results.IMAGE_REF)
+            - $(tasks.build-containers-remote.results.IMAGE_REF[*])
+            # - $(tasks.build-container-amd64.results.IMAGE_REF)
       runAfter:
-        - build-containers-multi-platform
+        - build-containers-remote
       taskRef:
         params:
           - name: name
             value: build-image-manifest
           - name: bundle
             value: quay.io/konflux-ci/tekton-catalog/task-build-image-manifest:0.1@sha256:231b521c5443a750cfcb302b74633ebe140b5ab0333688c91d32745417cc23a3
-            # value: quay.io/arewm/build-image-manifest@sha256:64267fff3bf7ec4bea5735e53bb94401b0e15d8329ad3e4319249555cefc6559
           - name: kind
             value: task
         resolver: bundles
@@ -441,9 +437,9 @@ spec:
       description: Path to a file with build arguments, see https://www.mankier.com/1/buildah-build#--build-arg-file
       default: ""
     - name: build-amd-in-cluster
-      type: array
+      type: string
       description: Whether to build amd64 images in-cluster. Set to false if planning to build amd64 remotely.
-      default: 'true'
+      default: 'false'
     - name: amd64-platform
       type: string
       description: Platform to use for amd64 remote builds
@@ -478,7 +474,7 @@ spec:
       value: "$(tasks.clone-repository.results.commit)"
     - name: JAVA_COMMUNITY_DEPENDENCIES
       description: ''
-      value: "$(tasks.build-containers-multi-platform.results.JAVA_COMMUNITY_DEPENDENCIES[0])"
+      value: "$(tasks.build-containers-remote.results.JAVA_COMMUNITY_DEPENDENCIES[0])"
     finally:
     - name: show-sbom
       taskRef:
