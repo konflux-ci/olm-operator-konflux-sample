@@ -53,7 +53,7 @@ We prepared for these nudges by reworking how the bundles [are built](https://gi
 
 ## Update references in the bundle to be valid after release
 
-Since bundle images are not rebuilt when they are pushed to another registry, we will need to build the image with references that *will* be valid. It is possible for the component nudge relationships to maintain these references [after configuring a ReleasePlanAdmission](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/#maintaining-valid-image-references-before-a-release).
+Since bundle images are not rebuilt when they are pushed to another registry, we will need to build the image with references that *will* be valid. It is possible for the component nudge relationships to maintain these references [after configuring a ReleasePlanAdmission](https://konflux-ci.dev/docs/advanced-how-tos/releasing/maintaining-references-before-release/).
 
 *Note: This step has not been performed with this sample repository as there is not a publicly configured location to define the ReleasePlanAdmissions*
 
