@@ -116,41 +116,44 @@ spec:
         value: $(params.build-args-file)
     - name: build-containers-remote
       matrix:
-        include:
-          # While this is possible to do, we build amd64 in-cluster instead.
-          #  In order to build amd64 remotely, uncomment this and disable
-          #  the in-cluster task by setting params.build-amd-in-cluster to false
-          # - name: amd64
-          #   params:
-          #     - name: IMAGE
-          #       value: $(params.output-image)-amd64
-          #     - name: PLATFORM
-          #       value: $(params.amd64-platform)
-          - name: arm64
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-arm64
-              - name: PLATFORM
-                value: $(params.arm64-platform)
-          - name: ppc64le
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-ppc64le
-              - name: PLATFORM
-                value: $(params.ppc64le-platform)
-          - name: s390x
-            params:
-              - name: IMAGE
-                value: $(params.output-image)-s390x
-              - name: PLATFORM
-                value: $(params.s390x-platform)
+        params:
+          - name: PLATFORM
+            value: ["$(params.remote-build-platforms)"]
+        # include:
+        #   # While this is possible to do, we build amd64 in-cluster instead.
+        #   #  In order to build amd64 remotely, uncomment this and disable
+        #   #  the in-cluster task by setting params.build-amd-in-cluster to false
+        #   # - name: amd64
+        #   #   params:
+        #   #     - name: IMAGE
+        #   #       value: $(params.output-image)-amd64
+        #   #     - name: PLATFORM
+        #   #       value: $(params.amd64-platform)
+        #   - name: arm64
+        #     params:
+        #       - name: IMAGE
+        #         value: $(params.output-image)-arm64
+        #       - name: PLATFORM
+        #         value: $(params.arm64-platform)
+        #   - name: ppc64le
+        #     params:
+        #       - name: IMAGE
+        #         value: $(params.output-image)-ppc64le
+        #       - name: PLATFORM
+        #         value: $(params.ppc64le-platform)
+        #   - name: s390x
+        #     params:
+        #       - name: IMAGE
+        #         value: $(params.output-image)-s390x
+        #       - name: PLATFORM
+        #         value: $(params.s390x-platform)
       taskRef:
         resolver: bundles
         params:
         - name: name
           value: buildah-remote-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:940d9c1b107fa07c1f75062a102319ee9f75bc1c3e70f739827530290e8c3b1b
+          value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:67ca03479b55fd1251312eacb16f1b73fbdebcb56cf9277c6fa737a08aae6fcd
         - name: kind
           value: task
       runAfter:
@@ -161,6 +164,8 @@ spec:
         values:
         - 'true'
       params:
+      - name: IMAGE
+        value: $(params.output-image)
       - name: DOCKERFILE
         value: "$(params.dockerfile)"
       - name: CONTEXT
@@ -187,7 +192,7 @@ spec:
           value: $(tasks.clone-repository.results.commit)
         - name: IMAGES
           value:
-            - $(tasks.build-containers-remote.results.IMAGE_REF[*])
+            - $(tasks.build-containers-remote.results.IMAGE_REF)
             # - $(tasks.build-container-amd64.results.IMAGE_REF)
       runAfter:
         - build-containers-remote
@@ -196,7 +201,7 @@ spec:
           - name: name
             value: build-image-manifest
           - name: bundle
-            value: quay.io/arewm/build-image-manifest@sha256:40b69a3465c08b704bf36e6c43e7d4d7b57aa70cf7953404e51710aa1c660259
+            value: quay.io/arewm/build-image-manifest@sha256:0c58f7ec737ea02fd57c4b7cc9223ce05a4fea4808d5cd0cb9a51e6e4e2e6713
           - name: kind
             value: task
         resolver: bundles
@@ -440,6 +445,13 @@ spec:
       type: string
       description: Whether to build amd64 images in-cluster. Set to false if planning to build amd64 remotely.
       default: 'false'
+    - name: remote-build-platforms
+      type: array
+      description: Array of platforms to use for the remote platform builds
+      default:
+      # - linux/arm64
+      # - linux/ppc64le
+      - linux/s390x
     - name: amd64-platform
       type: string
       description: Platform to use for amd64 remote builds
