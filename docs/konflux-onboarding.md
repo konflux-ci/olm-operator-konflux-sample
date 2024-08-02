@@ -65,7 +65,26 @@ FBC components and their validation are uniquely different from that of normal c
 
 ### Create the FBC in the git repository
 
-*While it is possible to create and manage the git repository today, we are actively working with the OLM team to make it even easier to migrate from a current catalog and to maintain the catalog with FBC in Konflux. Please check back soon!*
+If you already have a graph defined in a previous index, it is possible to migrate that to a FBC template
+```
+$ opm migrate <source index> ./catalog-migrate
+$ mkdir -p v4.13/catalog/gatekeeper-operator
+$ opm alpha convert-template basic ./catalog-migrate/gatekeeper-operator/catalog.json > v4.13/catalog-template.json
+```
+
+The resulting `catalog-template.json` is a simplified version of a FBC which should be easier to maintain.
+
+In order to render the actual catalog from the template, you can use `opm` as well
+
+```bash
+opm alpha render-template basic v4.13/catalog-template.json > v4.13/catalog/gatekeeper-operator/catalog.json
+```
+
+Once the catalog has been generated, this code can be committed to git as the source of your FBC fragment along with a Containerfile for the fragment.
+
+**NOTE:** The OPM version used for these commands is from a PR in review: https://github.com/operator-framework/operator-registry/pull/1384.
+
+**NOTE:** The parent image for the Containerfile needs to be `registry.redhat.io/openshift4/ose-operator-registry:v4.13` where the tag matches the OCP version that the catalog is being generated from.
 
 In the meantime, some other individuals have built some tools to make it easier to onboard to and manage FBC configuration:
 
