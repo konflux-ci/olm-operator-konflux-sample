@@ -1,6 +1,6 @@
 # Onboarding process for Konflux
 
-In order to increase transparency into the process of onboarding, we will document the steps taken in order to enable better reproducibility.
+In order to increase transparency into the [process of onboarding](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/), we will document the steps taken in order to enable better reproducibility.
 
 ## Prepare the git repository (optional)
 
@@ -11,6 +11,8 @@ In this repository, we used git submodules to [pull together multiple remote ref
 ## Onboard component(s) to Konflux
 
 After you have your git repository, the first step that is required is to create an application and onboard your component(s). This process can be done in either the UI or using a GitOps approach. While the initial component onboarding was performed using the UI for this sample, the CRs have also been defined via [GitOps after the fact](https://github.com/redhat-appstudio/tenants-config/pull/482).
+
+**NOTE:** If you have a custom Enterprise Contract policy that will be used for releasing, it will be beneficial to [configure it](https://konflux-ci.dev/docs/how-tos/testing/integration/editing/#configuring-the-enterprise-contract-policy) after the first component is onboarded (for example, before the tekton pipeline definitions are merged). This will enable you to ensure that each artifact is meeting the policy as it is getting onboarded.
 
 ### Merge tekton pipleine definitions
 
@@ -49,6 +51,12 @@ In order to ensure that the bundle image is always up to date with the latest ga
 
 We prepared for these nudges by reworking how the bundles [are built](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/16). In that PR, we ensured that we have the full pullspec (and digest) of the nudging components' images in a file. This process enables us to easily modify and update the ClusterServiceVersion in the bundle image. While it is possible to update the image pullspecs directly in the bundle as well, it was separated out here to specifically enable additional customizations on top of the `operator-sdk` tooling to build the bundle.
 
+## Update references in the bundle to be valid after release
+
+Since bundle images are not rebuilt when they are pushed to another registry, we will need to build the image with references that *will* be valid. It is possible for the component nudge relationships to maintain these references [after configuring a ReleasePlanAdmission](https://konflux-ci.dev/docs/advanced-how-tos/releasing/maintaining-references-before-release/).
+
+*Note: This step has not been performed with this sample repository as there is not a publicly configured location to define the ReleasePlanAdmissions*
+
 ## Building a file-based catalog
 
 An OLM catalog describes the operators that are available for installation, their dependencies, and their upgrade compatibility. [File-based catalogs (FBC)s](https://olm.operatorframework.io/docs/reference/file-based-catalogs/) are the latest iteration of OLM's catalog format.
@@ -57,10 +65,42 @@ FBC components and their validation are uniquely different from that of normal c
 
 ### Create the FBC in the git repository
 
-*While it is possible to create and manage the git repository today, we are actively working with the OLM team to make it even easier to migrate from a current catalog and to maintain the catalog with FBC in Konflux. Please check back soon!*
+If you already have a graph defined in a previous index, it is possible to migrate that to a FBC template
+```
+$ opm migrate <source index> ./catalog-migrate
+$ mkdir -p v4.13/catalog/gatekeeper-operator
+$ opm alpha convert-template basic ./catalog-migrate/gatekeeper-operator/catalog.json > v4.13/catalog-template.json
+```
+
+The resulting `catalog-template.json` is a simplified version of a FBC which should be easier to maintain.
+
+In order to render the actual catalog from the template, you can use `opm` as well
+
+```bash
+opm alpha render-template basic v4.13/catalog-template.json > v4.13/catalog/gatekeeper-operator/catalog.json
+```
+
+Once the catalog has been generated, this code can be committed to git as the source of your FBC fragment along with a Containerfile for the fragment.
+
+**NOTE:** The OPM version used for these commands is from a PR in review: https://github.com/operator-framework/operator-registry/pull/1384.
+
+**NOTE:** The parent image for the Containerfile needs to be `registry.redhat.io/openshift4/ose-operator-registry:v4.13` where the tag matches the OCP version that the catalog is being generated from.
+
+In the meantime, some other individuals have built some tools to make it easier to onboard to and manage FBC configuration:
+
+* https://github.com/ASzc/fbc-utils
+
+**NOTE:** The file-based catalogs should be nested with `/configs` in a directory which matches the package name. This ensures that the catalogs for separate packages are easily distinguishable.
+
+```
+$ tree configs
+configs
+└── package-name
+    └── catalog.json
+```
 
 ### Onboard the FBC to Konflux
 
-Once the git repository is configured with the expanded catalog committed to the repository, you just need to onboard the component with the dedicated FBC pipeline.
+Once the git repository is configured with the expanded catalog committed to the repository, you need to [onboard the component](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/#building-the-file-based-catalog) with the dedicated FBC pipeline.
 
 If you want to test the catalog on multiple architectures, you will need to generate the catalog with a multi-arch pipeline.
