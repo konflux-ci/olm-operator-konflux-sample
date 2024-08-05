@@ -78,9 +78,9 @@ spec:
         resolver: bundles
         params:
         - name: name
-          value: buildah-remote-oci-ta
+          value: buildah-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:5a95c0c2bc07ae6503293a0c06934d43d2ace7025953abbd4f4b5e36b2a22ddd
+          value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2@sha256:46c6bf4872647a80aa8375fab221ea4483356da8a43b5f5b0cdc6a4f76fbc95e
         - name: kind
           value: task
       runAfter:
@@ -90,13 +90,12 @@ spec:
         operator: in
         values:
         - 'true'
-      - input: "$(params.enable-amd64-build)"
+      - input: "$(params.build-amd-in-cluster)"
         operator: in
-        values:
-        - 'true'
+        values: ['true']
       params:
       - name: IMAGE
-        value: "$(params.output-image)-amd64"
+        value: $(params.output-image)-amd64
       - name: DOCKERFILE
         value: "$(params.dockerfile)"
       - name: CONTEXT
@@ -115,16 +114,46 @@ spec:
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
       - name: BUILD_ARGS_FILE
         value: $(params.build-args-file)
-      - name: PLATFORM
-        value: $(params.amd64-platform)
-    - name: build-container-arm64
+    - name: build-containers-remote
+      matrix:
+        params:
+          - name: PLATFORM
+            value: ["$(params.remote-build-platforms)"]
+        # include:
+        #   # While this is possible to do, we build amd64 in-cluster instead.
+        #   #  In order to build amd64 remotely, uncomment this and disable
+        #   #  the in-cluster task by setting params.build-amd-in-cluster to false
+        #   # - name: amd64
+        #   #   params:
+        #   #     - name: IMAGE
+        #   #       value: $(params.output-image)-amd64
+        #   #     - name: PLATFORM
+        #   #       value: $(params.amd64-platform)
+        #   - name: arm64
+        #     params:
+        #       - name: IMAGE
+        #         value: $(params.output-image)-arm64
+        #       - name: PLATFORM
+        #         value: $(params.arm64-platform)
+        #   - name: ppc64le
+        #     params:
+        #       - name: IMAGE
+        #         value: $(params.output-image)-ppc64le
+        #       - name: PLATFORM
+        #         value: $(params.ppc64le-platform)
+        #   - name: s390x
+        #     params:
+        #       - name: IMAGE
+        #         value: $(params.output-image)-s390x
+        #       - name: PLATFORM
+        #         value: $(params.s390x-platform)
       taskRef:
         resolver: bundles
         params:
         - name: name
           value: buildah-remote-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:5a95c0c2bc07ae6503293a0c06934d43d2ace7025953abbd4f4b5e36b2a22ddd
+          value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:d6c86ec2e5e8358712a6edc95f8577ea84a1eadc89093f567f8416daa0786762
         - name: kind
           value: task
       runAfter:
@@ -134,13 +163,9 @@ spec:
         operator: in
         values:
         - 'true'
-      - input: "$(params.enable-arm64-build)"
-        operator: in
-        values:
-        - 'true'
       params:
       - name: IMAGE
-        value: "$(params.output-image)-arm64"
+        value: $(params.output-image)
       - name: DOCKERFILE
         value: "$(params.dockerfile)"
       - name: CONTEXT
@@ -159,96 +184,6 @@ spec:
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
       - name: BUILD_ARGS_FILE
         value: $(params.build-args-file)
-      - name: PLATFORM
-        value: $(params.arm64-platform)
-    - name: build-container-ppc64le
-      taskRef:
-        resolver: bundles
-        params:
-        - name: name
-          value: buildah-remote-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:5a95c0c2bc07ae6503293a0c06934d43d2ace7025953abbd4f4b5e36b2a22ddd
-        - name: kind
-          value: task
-      runAfter:
-        - prefetch-dependencies
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: in
-        values:
-        - 'true'
-      - input: "$(params.enable-ppc64le-build)"
-        operator: in
-        values:
-        - 'true'
-      params:
-      - name: IMAGE
-        value: "$(params.output-image)-ppc64le"
-      - name: DOCKERFILE
-        value: "$(params.dockerfile)"
-      - name: CONTEXT
-        value: "$(params.path-context)"
-      - name: HERMETIC
-        value: "$(params.hermetic)"
-      - name: PREFETCH_INPUT
-        value: "$(params.prefetch-input)"
-      - name: IMAGE_EXPIRES_AFTER
-        value: "$(params.image-expires-after)"
-      - name: COMMIT_SHA
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
-      - name: CACHI2_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
-      - name: BUILD_ARGS_FILE
-        value: $(params.build-args-file)
-      - name: PLATFORM
-        value: $(params.ppc64le-platform)
-    - name: build-container-s390x
-      taskRef:
-        resolver: bundles
-        params:
-        - name: name
-          value: buildah-remote-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.2@sha256:5a95c0c2bc07ae6503293a0c06934d43d2ace7025953abbd4f4b5e36b2a22ddd
-        - name: kind
-          value: task
-      runAfter:
-        - prefetch-dependencies
-      when:
-      - input: "$(tasks.init.results.build)"
-        operator: in
-        values:
-        - 'true'
-      - input: "$(params.enable-s390x-build)"
-        operator: in
-        values:
-        - 'true'
-      params:
-      - name: IMAGE
-        value: "$(params.output-image)-s390x"
-      - name: DOCKERFILE
-        value: "$(params.dockerfile)"
-      - name: CONTEXT
-        value: "$(params.path-context)"
-      - name: HERMETIC
-        value: "$(params.hermetic)"
-      - name: PREFETCH_INPUT
-        value: "$(params.prefetch-input)"
-      - name: IMAGE_EXPIRES_AFTER
-        value: "$(params.image-expires-after)"
-      - name: COMMIT_SHA
-        value: "$(tasks.clone-repository.results.commit)"
-      - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
-      - name: CACHI2_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
-      - name: BUILD_ARGS_FILE
-        value: $(params.build-args-file)
-      - name: PLATFORM
-        value: $(params.s390x-platform)
     - name: build-image-index
       params:
         - name: IMAGE
@@ -257,21 +192,16 @@ spec:
           value: $(tasks.clone-repository.results.commit)
         - name: IMAGES
           value:
-            - $(tasks.build-container-amd64.results.IMAGE_URL)@$(tasks.build-container-amd64.results.IMAGE_DIGEST)
-            - $(tasks.build-container-arm64.results.IMAGE_URL)@$(tasks.build-container-arm64.results.IMAGE_DIGEST)
-            - $(tasks.build-container-s390x.results.IMAGE_URL)@$(tasks.build-container-s390x.results.IMAGE_DIGEST)
-            - $(tasks.build-container-ppc64le.results.IMAGE_URL)@$(tasks.build-container-ppc64le.results.IMAGE_DIGEST)
+            - $(tasks.build-containers-remote.results.IMAGE_REF[*])
+            # - $(tasks.build-container-amd64.results.IMAGE_REF)
       runAfter:
-        - build-container-amd64
-        - build-container-arm64
-        - build-container-s390x
-        - build-container-ppc64le
+        - build-containers-remote
       taskRef:
         params:
           - name: name
             value: build-image-manifest
           - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-build-image-manifest:0.1@sha256:71cdb1cedcfe5ea97c51d3b2a4e6bef4e04bd035efd90c9bb5a28ef5e48640ea
+            value: quay.io/arewm/build-image-manifest@sha256:0c58f7ec737ea02fd57c4b7cc9223ce05a4fea4808d5cd0cb9a51e6e4e2e6713
           - name: kind
             value: task
         resolver: bundles
@@ -511,38 +441,32 @@ spec:
       type: string
       description: Path to a file with build arguments, see https://www.mankier.com/1/buildah-build#--build-arg-file
       default: ""
-    # We need matrix builds in order to use these "enable architecture" parameters: https://issues.redhat.com/browse/EC-654
-    - name: enable-amd64-build
+    - name: build-amd-in-cluster
       type: string
-      description: Enable amd64 builds 
-      default: "true"
-    - name: enable-arm64-build
-      type: string
-      description: Enable arm64 builds 
-      default: "true"
-    - name: enable-ppc64le-build
-      type: string
-      description: Enable ppc64le builds 
-      default: "true"
-    - name: enable-s390x-build
-      type: string
-      description: Enable s390x builds 
-      default: "true"
+      description: Whether to build amd64 images in-cluster. Set to false if planning to build amd64 remotely.
+      default: 'false'
+    - name: remote-build-platforms
+      type: array
+      description: Array of platforms to use for the remote platform builds
+      default:
+      # - linux/arm64
+      - linux/ppc64le
+      - linux/s390x
     - name: amd64-platform
       type: string
-      description: Enable the amd64 platform to be changed from the PipelineRun file
+      description: Platform to use for amd64 remote builds
       default: linux/amd64
     - name: arm64-platform
       type: string
-      description: Enable the arm64 platform to be changed from the PipelineRun file
+      description: Platform to use for arm64 remote builds
       default: linux/arm64
     - name: ppc64le-platform
       type: string
-      description: Enable the ppc64le platform to be changed from the PipelineRun file
+      description: Platform to use for ppc64le remote builds
       default: linux/ppc64le
     - name: s390x-platform
       type: string
-      description: Enable the s390x platform to be changed from the PipelineRun file
+      description: Platform to use for s390x remote builds
       default: linux/s390x
     workspaces:
     - name: git-auth
@@ -562,7 +486,7 @@ spec:
       value: "$(tasks.clone-repository.results.commit)"
     - name: JAVA_COMMUNITY_DEPENDENCIES
       description: ''
-      value: "$(tasks.build-container-amd64.results.JAVA_COMMUNITY_DEPENDENCIES)"
+      value: "$(tasks.build-containers-remote.results.JAVA_COMMUNITY_DEPENDENCIES[0])"
     finally:
     - name: show-sbom
       taskRef:
