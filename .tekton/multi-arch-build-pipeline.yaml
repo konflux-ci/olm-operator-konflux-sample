@@ -80,7 +80,7 @@ spec:
         - name: name
           value: buildah-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-oci-ta:0.2@sha256:46c6bf4872647a80aa8375fab221ea4483356da8a43b5f5b0cdc6a4f76fbc95e
+          value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:d6c86ec2e5e8358712a6edc95f8577ea84a1eadc89093f567f8416daa0786762
         - name: kind
           value: task
       runAfter:
@@ -153,7 +153,7 @@ spec:
         - name: name
           value: buildah-remote-oci-ta
         - name: bundle
-          value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:67ca03479b55fd1251312eacb16f1b73fbdebcb56cf9277c6fa737a08aae6fcd
+          value: quay.io/arewm/buildah-remote-oci-ta-bundle@sha256:d6c86ec2e5e8358712a6edc95f8577ea84a1eadc89093f567f8416daa0786762
         - name: kind
           value: task
       runAfter:
@@ -450,7 +450,7 @@ spec:
       description: Array of platforms to use for the remote platform builds
       default:
       # - linux/arm64
-      # - linux/ppc64le
+      - linux/ppc64le
       - linux/s390x
     - name: amd64-platform
       type: string
