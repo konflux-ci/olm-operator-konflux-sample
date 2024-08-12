@@ -86,10 +86,6 @@ Once the catalog has been generated, this code can be committed to git as the so
 
 **NOTE:** The parent image for the Containerfile needs to be `registry.redhat.io/openshift4/ose-operator-registry:v4.13` where the tag matches the OCP version that the catalog is being generated from.
 
-In the meantime, some other individuals have built some tools to make it easier to onboard to and manage FBC configuration:
-
-* https://github.com/ASzc/fbc-utils
-
 **NOTE:** The file-based catalogs should be nested with `/configs` in a directory which matches the package name. This ensures that the catalogs for separate packages are easily distinguishable.
 
 ```
@@ -104,3 +100,17 @@ configs
 Once the git repository is configured with the expanded catalog committed to the repository, you need to [onboard the component](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/#building-the-file-based-catalog) with the dedicated FBC pipeline.
 
 If you want to test the catalog on multiple architectures, you will need to generate the catalog with a multi-arch pipeline.
+
+### Maintain the FBC graph
+
+You might be familiar with maintaining your operator graph using the properties like `replaces`, `skips`, and `olm.skipRange` in the bundle's CSV. When maintaining your graph with a FBC fragment, you will instead be able to update the `catalog-template.json` and then re-render the catalog to produce the full catalog that will be used by OLM. 
+
+In [PR#60](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/60), we add the bundle image that we just onboarded to the previous graph that was defined from our source catalog. In this PR, we added the bundle to the `stable` channel as well as added a new channel for the `X.Y` version of the operator. After updating the template, re-running the `opm alpha render-template basic` command will render the template to produce the full catalog for inclusion in the fragment.
+
+If you inspect at the `catalog.json` file that was modified in [#60](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/60), you will notice that there are image references pointing to pullspecs in `quay.io/redhat-user-workloads`. These are coming from the pullspec of the bundle image in the template as well as the relatedImages in that bundle. While the bundle image needs to be valid for the generation of the catalog, the catalog can be post-processed (i.e. pre-commit or during the build) to modify any pullspecs to the ultimate target location. If you are [ensuring that references will be valid after release](#update-references-in-the-bundle-to-be-valid-after-release), you shouldn't have to update the related images but you will still need to update the pullspec for the bundle image.
+
+This process of creating and maintaining FBC graphs can be integrated into your development flow in many ways (i.e. manually, scripting the updates based on bundle images, using component nudges). Some individuals have built tools to make it easier to onboard to and manage FBC configuration including:
+
+* https://github.com/ASzc/fbc-utils
+
+(If you would like to add references to new repositories/tools, please open a PR!)
