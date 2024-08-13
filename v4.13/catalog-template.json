@@ -45,6 +45,17 @@
         {
             "entries": [
                 {
+                    "name": "gatekeeper-operator.v3.15.1",
+                    "skipRange": "\u003c3.15.1"
+                }
+            ],
+            "name": "3.15",
+            "package": "gatekeeper-operator",
+            "schema": "olm.channel"
+        },
+        {
+            "entries": [
+                {
                     "name": "gatekeeper-operator.v3.11.2",
                     "skipRange": "\u003c3.11.0"
                 },
@@ -57,6 +68,11 @@
                     "name": "gatekeeper-operator.v3.14.1",
                     "replaces": "gatekeeper-operator.v3.14.0",
                     "skipRange": "\u003c3.14.0"
+                },
+                {
+                    "name": "gatekeeper-operator.v3.15.1",
+                    "replaces": "gatekeeper-operator.v3.14.1",
+                    "skipRange": "\u003c3.15.1"
                 }
             ],
             "name": "stable",
@@ -78,6 +94,10 @@
         {
             "schema": "olm.bundle",
             "image": "quay.io/gatekeeper/gatekeeper-operator-bundle:v3.14.1"
+        },
+        {
+            "schema": "olm.bundle",
+            "image": "quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator-bundle:ba803e7ff185a2be7eedb5feef71d68d1e4dea06"
         }
     ]
 }
