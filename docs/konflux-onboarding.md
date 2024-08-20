@@ -59,13 +59,16 @@ Since bundle images are not rebuilt when they are pushed to another registry, we
 
 ## Building a file-based catalog
 
-An OLM catalog describes the operators that are available for installation, their dependencies, and their upgrade compatibility. [File-based catalogs (FBC)s](https://olm.operatorframework.io/docs/reference/file-based-catalogs/) are the latest iteration of OLM's catalog format.
+An OLM catalog describes the operators that are available for installation, their dependencies, and their upgrade compatibility. [File-based catalogs (FBC)s](https://olm.operatorframework.io/docs/reference/file-based-catalogs/) are the latest iteration of OLM's catalog format. While it is possible to manage your catalog file directly, there are two different [catalog templates](https://olm.operatorframework.io/docs/reference/catalog-templates/) that OPM provides to simplify the management based on a set of bundle references:
+
+* [`basic template](https://olm.operatorframework.io/docs/reference/catalog-templates/#basic-template): This schema enables you to have full control of the graph by adding any valid [FBC schema](https://olm.operatorframework.io/docs/reference/file-based-catalogs/#olm-defined-schemas) components while only specifying the bundle image references. This results in a much more compact document.
+* [`semver template`](https://olm.operatorframework.io/docs/reference/catalog-templates/#semver-template): This schema enables the auto-generation of channels adhering to [Semantic Versioning](https://semver.org/) (semver) guidelines and consistent with best practices on [channel naming](https://olm.operatorframework.io/docs/best-practices/channel-naming/#naming). This template is even simpler that the basic template is likely not possible to use if you are migrating to FBC from another catalog. If channel names and edges/nodes are misaligned from a previous catalog, it may be possible to make consumers stranded on the current version without an upgrade path.
 
 FBC components and their validation are uniquely different from that of normal container images, so a [dedicated pipeline](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/#building-the-file-based-catalog) is provided with appropriate build-time checks. While operators and their bundles can often be supported on multiple platform (for example Red Hat OpenShift) versions, separate catalogs will often be generated for each platform version. Since there are often multiple streams/versions of bundle images that need to be referenced in the FBC components, it will likely be beneficial to isolate all FBC components in their own application. In this sample repository, however, we will include it in the same application as we will only illustrate generating a FBC for a single version of Red Hat OpenShift.
 
 ### Create the FBC in the git repository
 
-If you already have a graph defined in a previous index, it is possible to migrate that to a FBC template
+If you already have a graph defined in a previous index, it is recommended to migrate this graph to a `basic` FBC template
 ```
 $ opm migrate <source index> ./catalog-migrate
 $ mkdir -p v4.13/catalog/gatekeeper-operator
@@ -82,7 +85,7 @@ opm alpha render-template basic v4.13/catalog-template.json > v4.13/catalog/gate
 
 Once the catalog has been generated, this code can be committed to git as the source of your FBC fragment along with a Containerfile for the fragment.
 
-**NOTE:** The OPM version used for these commands is from a PR in review: https://github.com/operator-framework/operator-registry/pull/1384.
+**NOTE:** You must use OPM [v1.46.0](https://github.com/operator-framework/operator-registry/releases/tag/v1.46.0) or higher to run these commands.
 
 **NOTE:** The parent image for the Containerfile needs to be `registry.redhat.io/openshift4/ose-operator-registry:v4.13` where the tag matches the OCP version that the catalog is being generated from.
 
@@ -111,6 +114,6 @@ If you inspect at the `catalog.json` file that was modified in [#60](https://git
 
 This process of creating and maintaining FBC graphs can be integrated into your development flow in many ways (i.e. manually, scripting the updates based on bundle images, using component nudges). Some individuals have built tools to make it easier to onboard to and manage FBC configuration including:
 
-* https://github.com/ASzc/fbc-utils
+* https://github.com/ASzc/fbc-utils (These scripts use the `semver template`)
 
 (If you would like to add references to new repositories/tools, please open a PR!)
