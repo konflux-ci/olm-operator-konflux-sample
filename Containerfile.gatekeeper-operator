@@ -1,6 +1,6 @@
 # Based on ./gatekeeper-operator/Dockerfile
 # Build the manager binary
-FROM registry.access.redhat.com/ubi9/go-toolset:1.21.11-7 as builder
+FROM registry.access.redhat.com/ubi9/go-toolset:1.21.11-7.1724233645 as builder
 USER 0
 ENV LDFLAGS="-X ${VERSION_PKG}.gitVersion=v3.15.1-7 \
              -X ${VERSION_PKG}.gitCommit=59587323ce32580b4dffba0a09b1ca22109925db \
