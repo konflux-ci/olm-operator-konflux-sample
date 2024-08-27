@@ -117,3 +117,9 @@ This process of creating and maintaining FBC graphs can be integrated into your 
 * https://github.com/ASzc/fbc-utils (These scripts use the `semver template`)
 
 (If you would like to add references to new repositories/tools, please open a PR!)
+
+### Convert FBC pipeline to multi-arch
+
+If you plan to use your catalogs on multiple cluster architectures, you will need to build your FBC fragments on multiple architectures by modifying the Tekton PipelineRuns. 
+
+A sample PR for these changes can be found in https://github.com/konflux-ci/olm-operator-konflux-sample/pull/65.
