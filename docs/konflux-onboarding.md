@@ -152,3 +152,13 @@ RUN /detector.sh ./Dockerfile /drift-cache/submodule-name/Dockerfile
 *NOTE: You do NOT need to add these cached files to your `on-cel-expression`s as they will just be updated along with the submodule references*
 
 **CAUTION:** By default, the buildah tasks in Konflux enable [--skip-unused-stages](https://github.com/containers/buildah/blob/main/docs/buildah-build.1.md) which skips unnecessary stages in a multi-stage build. If you add drift detection in its own stage, you need to either disable this by setting the `SKIP_UNUSED_STAGES` parameter on the task or copy some content out of the stage to ensure that it is a used stage.
+
+## Add renovate configuration (optional)
+
+When you onboard to Konflux, a Renovate service called MintMaker will start to update your repository according to the [default configuration](https://github.com/konflux-ci/mintmaker/blob/main/config/renovate/renovate.json). This service will help to ensure that any dependencies are updated throughout your repository which will also help to quickly resolve CVEs.
+
+While this is beneficial, its functionality might not be properly tailored to your repository. If you have other processes for updating certain dependencies, MintMaker might create conflicting or duplicate PRs. If you have content that is not used in builds (i.e. cache files), MintMaker may unnecessarily update files.
+
+In [PR#73](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/73), we extended the MintMaker configuration to ignore the cache directory. More information on customizing Renovate's configuration can be found in the [Renovate docs](https://docs.renovatebot.com/configuration-options/).
+
+**WARNING:** If you do not extend the MintMaker configuration, you will not be able to take advantage of any new functionality added to MintMaker.

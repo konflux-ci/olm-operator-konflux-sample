@@ -1,0 +1,6 @@
+{
+    "extends": [
+        "github>konflux-ci/mintmaker//config/renovate/renovate.json"
+    ],
+    "ignorePaths": ["drift-cache"]
+}
