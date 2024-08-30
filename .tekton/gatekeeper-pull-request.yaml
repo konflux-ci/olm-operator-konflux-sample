@@ -7,9 +7,9 @@ metadata:
     build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch == "main" && 
-      (".tekton/multi-arch-build-pipeline.yaml".pathChanged() || 
-      ".tekton/gatekeeper-pull-request.yaml".pathChanged() || 
+    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch == "main" &&
+      (".tekton/multi-arch-build-pipeline.yaml".pathChanged() ||
+      ".tekton/gatekeeper-pull-request.yaml".pathChanged() ||
       ".tekton/gatekeeper-push.yaml".pathChanged() ||
       "Containerfile.gatekeeper".pathChanged() ||
       "gatekeeper".pathChanged())
@@ -29,11 +29,20 @@ spec:
   - name: output-image
     value: quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper:on-pr-{{revision}}
   - name: image-expires-after
-    value: 3d
+    value: 5d
   - name: dockerfile
     value: Containerfile.gatekeeper
+  - name: path-context
+    value: .
+  - name: build-platforms
+    value:
+      - localhost
+      - linux/arm64
+  #     - linux/ppc64le
+  #     - linux/s390x
   pipelineRef:
-    name: multi-arch-build-pipeline
+    name: build-pipeline
+  taskRunTemplate: {}
   workspaces:
   - name: git-auth
     secret:
