@@ -33,6 +33,8 @@ More information on the specifics for these customizations can be found in [func
 
 NOTE: The multi-arch builds were not properly building the index image until [all architectures](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/15) were enabled.
 
+**NOTE:** The pipelines were re-overhauled in [PR#69](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/69) to utilize the new system-defined multi-arch pipeline. Further information about this conversion can be found in the PR text.
+
 ### Add more Components as necessary
 
 We onboarded the bundle component after the first two components were built. The process of onboarding components as well as merging and customizing the pipelines can be repeated until all components are created and building properly.
