@@ -1,5 +1,5 @@
 ARG BUILDPLATFORM="linux/amd64"
-ARG BUILDERIMAGE="golang:1.21-bullseye"
+ARG BUILDERIMAGE="golang:1.23-bullseye"
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 ARG BASEIMAGE="gcr.io/distroless/cc-debian11:nonroot"
