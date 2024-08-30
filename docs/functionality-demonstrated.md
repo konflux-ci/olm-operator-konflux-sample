@@ -69,3 +69,7 @@ The gatekeeper and gatekeeper operator's "push" pipelines both specify the file 
 Git submodules are a convenient way to vendor source code, especially if you want to build the repositories without having to manage updating a fork and maintaining your own build-specific configurations during these syncs. One disadvantage to these submodules, however, is that the updates included can easily be opaque which can easily result in drift between your build process and that of the original repository. This becomes harder when you have an external tool like Renovate which automatically suggests updates to the submodules.
 
 This functionality is documented further in konflux-ci/olm-operator-konflux-sample#71 as well as in [konflux-onboarding.md](./konflux-onboarding.md#enable-drift-detection-optional).
+
+## Add Renovate configuration
+
+When onboarding to Konflux, a Renovate instance will help to keep all of your references up to date. You might not want all of the functionality enabled by default. The best practice for this is to extend the original configuration while removing the specific functionality that is undesired with as narrow of a scope as possible. This will ensure that you can still get timely updates for any dependencies including to resolve CVEs. This is described further in [konflux-onboarding.md](./konflux-onboarding.md#add-renovate-configuration-optional).
