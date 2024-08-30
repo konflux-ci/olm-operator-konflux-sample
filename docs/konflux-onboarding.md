@@ -162,3 +162,7 @@ While this is beneficial, its functionality might not be properly tailored to yo
 In [PR#73](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/73), we extended the MintMaker configuration to ignore the cache directory. More information on customizing Renovate's configuration can be found in the [Renovate docs](https://docs.renovatebot.com/configuration-options/).
 
 **WARNING:** If you do not extend the MintMaker configuration, you will not be able to take advantage of any new functionality added to MintMaker.
+
+**NOTE:** If you have Renovate installed, or you have the Renovate image for podman/docker, you can use `renovate-config-validator` to have your config checked:
+https://docs.renovatebot.com/config-validation/
+
