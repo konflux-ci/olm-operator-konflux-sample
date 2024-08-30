@@ -1,3 +1,4 @@
+# Adding simulated drift!
 ARG BUILDPLATFORM="linux/amd64"
 ARG BUILDERIMAGE="golang:1.21-bullseye"
 # Use distroless as minimal base image to package the manager binary
