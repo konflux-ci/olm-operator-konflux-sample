@@ -1,4 +1,3 @@
-# Adding simulated drift!
 ARG BUILDPLATFORM="linux/amd64"
 ARG BUILDERIMAGE="golang:1.21-bullseye"
 # Use distroless as minimal base image to package the manager binary
@@ -6,6 +5,12 @@ ARG BUILDERIMAGE="golang:1.21-bullseye"
 ARG BASEIMAGE="gcr.io/distroless/cc-debian11:nonroot"
 
 FROM --platform=$BUILDPLATFORM $BUILDERIMAGE as builder
+
+
+
+
+
+
 
 ARG TARGETPLATFORM
 ARG TARGETOS
