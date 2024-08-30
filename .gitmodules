@@ -6,3 +6,6 @@
 	path = gatekeeper
 	url = https://github.com/stolostron/gatekeeper.git
 	branch = release-3.15
+[submodule "drift-detection"]
+	path = drift-detection
+	url = https://github.com/arewm/drift-detection

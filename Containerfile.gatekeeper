@@ -1,6 +1,13 @@
 # Based on ./gatekeeper/Dockerfile
 FROM registry.access.redhat.com/ubi9/go-toolset:1.21.11-7.1724661022 as builder
 USER 0
+COPY drift-detection/detector.sh /detector.sh
+# Check to see if we need to react to any uptream changes
+COPY drift-cache /drift-cache
+WORKDIR /tmp
+COPY gatekeeper/Dockerfile .
+RUN /detector.sh ./Dockerfile /drift-cache/gatekeeper/Dockerfile
+
 ENV LDFLAGS="-X github.com/open-policy-agent/gatekeeper/v3/pkg/version.Version=v3.15.1" \
     GO111MODULE=on \
     CGO_ENABLED=1

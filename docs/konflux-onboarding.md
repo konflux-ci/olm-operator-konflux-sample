@@ -125,3 +125,30 @@ This process of creating and maintaining FBC graphs can be integrated into your 
 If you plan to use your catalogs on multiple cluster architectures, you will need to build your FBC fragments on multiple architectures by modifying the Tekton PipelineRuns. 
 
 A sample PR for these changes can be found in https://github.com/konflux-ci/olm-operator-konflux-sample/pull/65.
+
+## Enable drift detection (optional)
+
+In this repository, we chose to maintain dedicated Containerfiles locally instead of using the ones inside the submodules. While this allows us to have complete control over the build process, it does lead to the possibility of upstream repositories changing their build process without making appropriate changes in our repository. This risk can be mitigated by detecting (and failing on) within the submodules.
+
+In order to create a reproducible tool, _another_ submodule is used to contain a script needed to detect drift: https://github.com/arewm/drift-detection. After including this tool, the process for detecting drift is as follows:
+
+1. Store a copy of the submodules' sensitive files ensuring that they are clearly identifiable and separated from each other.
+2. Modify your build process (for example a Containerfile) to compare the cached files against those pulled in from the submodule:
+
+```dockerfile
+COPY drift-detection/detector.sh /detector.sh
+# Check to see if we need to react to any uptream changes
+COPY drift-cache /drift-cache
+WORKDIR /tmp
+COPY submodule-path/Dockerfile .
+RUN /detector.sh ./Dockerfile /drift-cache/submodule-name/Dockerfile
+```
+
+3. If the files match, `detector.sh` will return cleanly and the build will continue. If the files do not match, `detector.sh` will display the mismatched content and will error out, causing your build to fail.
+4. If your build fails, update the cached files and make any required changes (if any) to your build process. Commit and push the content to the PR to retest the change.
+
+*NOTE: Some changes that cause failures will NOT require a similar change to be made in your local build process. For example, if a comment is modified in a Containerfile.*
+
+*NOTE: You do NOT need to add these cached files to your `on-cel-expression`s as they will just be updated along with the submodule references*
+
+**CAUTION:** By default, the buildah tasks in Konflux enable [--skip-unused-stages](https://github.com/containers/buildah/blob/main/docs/buildah-build.1.md) which skips unnecessary stages in a multi-stage build. If you add drift detection in its own stage, you need to either disable this by setting the `SKIP_UNUSED_STAGES` parameter on the task or copy some content out of the stage to ensure that it is a used stage.
