@@ -56,6 +56,9 @@ After properly configuring the cel expressions, a PR which updates content that 
       "gatekeeper-operator".pathChanged())
 ```
 
+When adding filter for directory use `"directory/***".pathChanged()` format.
+When adding filter for git submodule use `"submodule".pathChanged()` format.
+
 This indicates that the PipelineRun will only be executed if the event is a PR to the main branch and if on of the 5 specified files were included in the changeset. Documentation for filtering events can be found in [Pipelines as Code](https://pipelinesascode.com/docs/guide/authoringprs/#advanced-event-matching).
 
 While this results in improved resource utilization (lower cloud spend), it does mean that not all artifacts will be built from every commit. If you need to identify the specific commit which produced an artifact, you can query the artifact's attestations for the [build parameters](https://konflux-ci.dev/docs/how-tos/metadata/attestations/#identify-the-build-parameters).
