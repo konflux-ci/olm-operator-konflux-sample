@@ -6,6 +6,8 @@ metadata:
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
+    # when adding filter for directory use "directory/***".pathChanged()
+    # when adding filter for git submodule use "submodule".pathChanged()
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch == "main" && 
       (".tekton/single-arch-build-pipeline.yaml".pathChanged() || 
       ".tekton/gatekeeper-operator-bundle-pull-request.yaml".pathChanged() || 
