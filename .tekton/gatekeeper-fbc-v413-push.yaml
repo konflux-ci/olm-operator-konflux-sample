@@ -24,7 +24,7 @@ spec:
   - name: output-image
     value: quay.io/redhat-user-workloads/konflux-samples-tenant/gatekeeper-fbc-v413/gatekeeper-fbc-v413:{{revision}}
   - name: dockerfile
-    value: catalog.Containerfile
+    value: Containerfile.catalog
   - name: path-context
     value: v4.13
   - name: build-platforms
