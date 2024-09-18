@@ -10,7 +10,7 @@ COPY bundle-hack .
 COPY gatekeeper-operator/bundle/manifests /manifests/
 COPY gatekeeper-operator/bundle/metadata /metadata/
 
-RUN ./update_bundle.sh 
+RUN ./update_bundle.sh
 
 FROM scratch
 
