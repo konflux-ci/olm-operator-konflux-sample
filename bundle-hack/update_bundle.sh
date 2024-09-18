@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-export GATEKEEPER_GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:1c2fead5406f7c1c164efa83b56210839bc296400284d3ca80753ccdc08f274a"
+export GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:1c2fead5406f7c1c164efa83b56210839bc296400284d3ca80753ccdc08f274a"
 
 export GATEKEEPER_OPERATOR_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator@sha256:9539680c13deaac90cd6846bd5a39d5ce593eb92b6ce377076de2f09eb9dcc33"
 
 export CSV_FILE=/manifests/gatekeeper-operator.clusterserviceversion.yaml
 
-sed -i -e "s|quay.io/gatekeeper/gatekeeper:v.*|\"${GATEKEEPER_GATEKEEPER_IMAGE_PULLSPEC}\"|g" \
+sed -i -e "s|quay.io/gatekeeper/gatekeeper:v.*|\"${GATEKEEPER_IMAGE_PULLSPEC}\"|g" \
 	-e "s|quay.io/gatekeeper/gatekeeper-operator:v.*|\"${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC}\"|g" \
 	"${CSV_FILE}"
 
@@ -41,7 +41,7 @@ def dump_manifest(pathn, manifest):
 timestamp = int(os.getenv('EPOC_TIMESTAMP'))
 datetime_time = datetime.fromtimestamp(timestamp)
 gatekeeper_csv = load_manifest(os.getenv('CSV_FILE'))
-# Add arch support labels
+# Add arch and os support labels
 gatekeeper_csv['metadata']['labels'] = gatekeeper_csv['metadata'].get('labels', {})
 if os.getenv('AMD64_BUILT'):
 	gatekeeper_csv['metadata']['labels']['operatorframework.io/arch.amd64'] = 'supported'
@@ -52,7 +52,9 @@ if os.getenv('PPC64LE_BUILT'):
 if os.getenv('S390X_BUILT'):
 	gatekeeper_csv['metadata']['labels']['operatorframework.io/arch.s390x'] = 'supported'
 gatekeeper_csv['metadata']['labels']['operatorframework.io/os.linux'] = 'supported'
+# Ensure that the created timestamp is current
 gatekeeper_csv['metadata']['annotations']['createdAt'] = datetime_time.strftime('%d %b %Y, %H:%M')
+# Add annotations for the openshift operator features
 gatekeeper_csv['metadata']['annotations']['features.operators.openshift.io/disconnected'] = 'true'
 gatekeeper_csv['metadata']['annotations']['features.operators.openshift.io/fips-compliant'] = 'true'
 gatekeeper_csv['metadata']['annotations']['features.operators.openshift.io/proxy-aware'] = 'false'
@@ -60,8 +62,20 @@ gatekeeper_csv['metadata']['annotations']['features.operators.openshift.io/tls-p
 gatekeeper_csv['metadata']['annotations']['features.operators.openshift.io/token-auth-aws'] = 'false'
 gatekeeper_csv['metadata']['annotations']['features.operators.openshift.io/token-auth-azure'] = 'false'
 gatekeeper_csv['metadata']['annotations']['features.operators.openshift.io/token-auth-gcp'] = 'false'
+# Ensure that other annotations are accurate
 gatekeeper_csv['metadata']['annotations']['repository'] = 'https://github.com/stolostron/gatekeeper-operator'
-gatekeeper_csv['metadata']['annotations']['containerImage'] = os.getenv('GATEKEEPER_OPERATOR_IMAGE_PULLSPEC', '')
+gatekeeper_csv['metadata']['annotations']['containerImage'] = os.getenv('GATEKEEPER_OPERATOR_IMAGE_PULLSPEC') # fail if the get fails
+
+# Ensure that any parameters are properly defined in the spec if you do not want to
+# put them in the CSV itself
+gatekeeper_csv['spec']['description'] = """Gatekeeper allows administrators to detect and reject non-compliant commits to an infrastructure-as-code system\'s source-of-truth. This strengthens compliance efforts and prevents a bad state from slowing down the organization."""
+
+# Make sure that our latest nudged references are properly configured in the spec.relatedImages
+# NOTE: the names should be unique
+gatekeeper_csv['spec']['relatedImages'] = [
+   {'name': 'gatekeeper', 'image': os.getenv('GATEKEEPER_IMAGE_PULLSPEC')},
+   {'name': 'gatekeeper-operator', 'image': os.getenv('GATEKEEPER_OPERATOR_IMAGE_PULLSPEC')}
+]
 
 dump_manifest(os.getenv('CSV_FILE'), gatekeeper_csv)
 CSV_UPDATE
