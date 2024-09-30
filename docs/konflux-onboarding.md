@@ -70,7 +70,11 @@ FBC components and their validation are uniquely different from that of normal c
 
 ### Create the FBC in the git repository
 
-If you already have a graph defined in a previous index, it is recommended to migrate this graph to a `basic` FBC template
+**NOTE:** You must use OPM [v1.47.0](https://github.com/operator-framework/operator-registry/releases/tag/v1.47.0) or higher to run these commands.
+
+First, download the latest opm cli binary from https://github.com/operator-framework/operator-registry/releases - without the latest the `convert-template` command won't be available!
+
+Next, if you already have a graph defined in a previous index like `registry.redhat.io/redhat/redhat-operator-index:v4.13`, it is recommended to migrate this graph to a `basic` FBC template
 ```
 $ opm migrate <source index> ./catalog-migrate
 $ mkdir -p v4.13/catalog/gatekeeper-operator
@@ -87,11 +91,12 @@ opm alpha render-template basic v4.13/catalog-template.json > v4.13/catalog/gate
 
 Once the catalog has been generated, this code can be committed to git as the source of your FBC fragment along with a Containerfile for the fragment.
 
-**NOTE:** You must use OPM [v1.46.0](https://github.com/operator-framework/operator-registry/releases/tag/v1.46.0) or higher to run these commands.
+**NOTE:** The parent image for the Containerfile needs to match the version of OCP for which the catalog is being generated.
 
-**NOTE:** The parent image for the Containerfile needs to be `registry.redhat.io/openshift4/ose-operator-registry:v4.13` where the tag matches the OCP version that the catalog is being generated from.
+* For <= 4.14, use `registry.redhat.io/openshift4/ose-operator-registry:v4.yy` 
+* For >= 4.15, use `registry.redhat.io/openshift4/ose-operator-registry-rhel9:v4.yy`
 
-**NOTE:** The file-based catalogs should be nested with `/configs` in a directory which matches the package name. This ensures that the catalogs for separate packages are easily distinguishable.
+**NOTE:** In your Containerfile, file-based catalogs should be nested with `/configs` in a directory which matches the package name. This ensures that the catalogs for separate packages are easily distinguishable.
 
 ```
 $ tree configs
