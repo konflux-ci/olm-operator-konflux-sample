@@ -36,7 +36,6 @@ spec:
   - name: build-platforms
     value:
       - linux/x86_64
-      - linux/arm64
   pipelineSpec:
     finally:
     - name: show-sbom
@@ -273,7 +272,7 @@ spec:
         - name: kind
           value: task
         resolver: bundles
-    - name: inspect-image
+    - name: validate-fbc
       params:
       - name: IMAGE_URL
         value: $(tasks.build-image-index.results.IMAGE_URL)
@@ -284,9 +283,9 @@ spec:
       taskRef:
         params:
         - name: name
-          value: inspect-image
+          value: validate-fbc
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-inspect-image:0.1@sha256:09c6248583be3fa31d047fb5ebf84c5253cfdd0556adc7d42fc901161152ea87
+          value: quay.io/arewm/task-validate-fbc@sha256:dcc4490cbf04f4f1cd9ab00515f8a5a872a349a06ea6f788f600bab6c9d8e706
         - name: kind
           value: task
         resolver: bundles
@@ -295,56 +294,6 @@ spec:
         operator: in
         values:
         - "false"
-      workspaces:
-      - name: source
-        workspace: workspace
-    - name: fbc-validate
-      params:
-      - name: IMAGE_URL
-        value: $(tasks.build-image-index.results.IMAGE_URL)
-      - name: IMAGE_DIGEST
-        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-      - name: BASE_IMAGE
-        value: $(tasks.inspect-image.results.BASE_IMAGE)
-      runAfter:
-      - inspect-image
-      taskRef:
-        params:
-        - name: name
-          value: fbc-validation
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-fbc-validation:0.1@sha256:6e5c397128a4714b3e6508dfb9d77d07f674a71f448b5544f7faacbdee232953
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(params.skip-checks)
-        operator: in
-        values:
-        - "false"
-      workspaces:
-      - name: workspace
-        workspace: workspace
-    - name: fbc-related-image-check
-      runAfter:
-      - fbc-validate
-      taskRef:
-        params:
-        - name: name
-          value: fbc-related-image-check
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-fbc-related-image-check:0.1@sha256:23da3e821658f91dd0c94d1c1f9028f12c0e11da12fa24cbafc127d7c76e3d5f
-        - name: kind
-          value: task
-        resolver: bundles
-      when:
-      - input: $(params.skip-checks)
-        operator: in
-        values:
-        - "false"
-      workspaces:
-      - name: workspace
-        workspace: workspace
     workspaces:
     - name: workspace
     - name: git-auth
