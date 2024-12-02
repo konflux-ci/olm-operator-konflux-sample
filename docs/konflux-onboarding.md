@@ -83,7 +83,9 @@ $ opm alpha convert-template basic ./catalog-migrate/gatekeeper-operator/catalog
 
 The resulting `catalog-template.json` is a simplified version of a FBC which should be easier to maintain.
 
-In order to render the actual catalog from the template, you can use `opm` as well. Starting with 4.17 you need the `--migrate-level=bundle-object-to-csv-metadata` flag. For rendering to older versions of OCP, simply omit the flag.
+In order to render the actual catalog from the template, you should use `opm` as well. 
+
+NOTE: Starting with OCP 4.17 you need the `--migrate-level=bundle-object-to-csv-metadata` flag. For rendering to older versions of OCP, simply omit the flag.
 
 ```bash
 opm alpha render-template basic [--migrate-level=bundle-object-to-csv-metadata] v4.17/catalog-template.json > v4.17/catalog/gatekeeper-operator/catalog.json
