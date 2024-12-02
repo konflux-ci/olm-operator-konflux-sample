@@ -74,19 +74,19 @@ FBC components and their validation are uniquely different from that of normal c
 
 First, download the latest opm cli binary from https://github.com/operator-framework/operator-registry/releases - without the latest the `convert-template` command won't be available!
 
-Next, if you already have a graph defined in a previous index like `registry.redhat.io/redhat/redhat-operator-index:v4.13`, it is recommended to migrate this graph to a `basic` FBC template
+Next, if you already have a graph defined in a previous index like `registry.redhat.io/redhat/redhat-operator-index:v4.17`, it is recommended to migrate this graph to a `basic` FBC template
 ```
 $ opm migrate <source index> ./catalog-migrate
-$ mkdir -p v4.13/catalog/gatekeeper-operator
-$ opm alpha convert-template basic ./catalog-migrate/gatekeeper-operator/catalog.json > v4.13/catalog-template.json
+$ mkdir -p v4.17/catalog/gatekeeper-operator
+$ opm alpha convert-template basic ./catalog-migrate/gatekeeper-operator/catalog.json > v4.17/catalog-template.json
 ```
 
 The resulting `catalog-template.json` is a simplified version of a FBC which should be easier to maintain.
 
-In order to render the actual catalog from the template, you can use `opm` as well
+In order to render the actual catalog from the template, you can use `opm` as well. Starting with 4.17 you need the `--migrate-level=bundle-object-to-csv-metadata` flag. For rendering to older versions of OCP, simply omit the flag.
 
 ```bash
-opm alpha render-template basic v4.13/catalog-template.json > v4.13/catalog/gatekeeper-operator/catalog.json
+opm alpha render-template basic [--migrate-level=bundle-object-to-csv-metadata] v4.17/catalog-template.json > v4.17/catalog/gatekeeper-operator/catalog.json
 ```
 
 Once the catalog has been generated, this code can be committed to git as the source of your FBC fragment along with a Containerfile for the fragment.
