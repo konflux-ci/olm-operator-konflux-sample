@@ -88,7 +88,7 @@ In order to render the actual catalog from the template, you should use `opm` as
 NOTE: Starting with OCP 4.17 you need the `--migrate-level=bundle-object-to-csv-metadata` flag. For rendering to older versions of OCP, simply omit the flag.
 
 ```bash
-opm alpha render-template basic [--migrate-level=bundle-object-to-csv-metadata] v4.17/catalog-template.json > v4.17/catalog/gatekeeper-operator/catalog.json
+opm alpha render-template basic v4.17/catalog-template.json [--migrate-level=bundle-object-to-csv-metadata] > v4.17/catalog/gatekeeper-operator/catalog.json
 ```
 
 Once the catalog has been generated, this code can be committed to git as the source of your FBC fragment along with a Containerfile for the fragment.
