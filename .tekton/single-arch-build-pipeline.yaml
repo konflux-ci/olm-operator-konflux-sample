@@ -116,7 +116,7 @@ spec:
         - name: name
           value: source-build
         - name: bundle
-          value: quay.io/arewm/task-source-build:original
+          value: quay.io/arewm/task-source-build:modified
         - name: kind
           value: task
       when:
