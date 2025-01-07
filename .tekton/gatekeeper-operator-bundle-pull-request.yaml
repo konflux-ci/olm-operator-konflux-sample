@@ -37,6 +37,8 @@ spec:
     value: Containerfile.gatekeeper-operator-bundle
   - name: hermetic
     value: "false"
+  - name: build-source-image
+    value: "true"
   pipelineRef:
     name: single-arch-build-pipeline
   workspaces:
