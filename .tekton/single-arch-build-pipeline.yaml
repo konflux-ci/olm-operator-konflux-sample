@@ -309,10 +309,6 @@ spec:
       description: Enable dev-package-managers in prefetch task
       name: prefetch-dev-package-managers-enabled
       type: string
-    - name: java
-      type: string
-      description: Java build
-      default: 'false'
     - name: image-expires-after
       description: Image tag expiration time, time values could be something like 1h,
         2d, 3w for hours, days, and weeks, respectively.
@@ -337,9 +333,6 @@ spec:
     - name: CHAINS-GIT_COMMIT
       description: ''
       value: "$(tasks.clone-repository.results.commit)"
-    - name: JAVA_COMMUNITY_DEPENDENCIES
-      description: ''
-      value: "$(tasks.build-container.results.JAVA_COMMUNITY_DEPENDENCIES)"
     finally:
     - name: show-sbom
       taskRef:
