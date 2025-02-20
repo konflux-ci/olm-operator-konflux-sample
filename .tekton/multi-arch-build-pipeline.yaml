@@ -108,6 +108,8 @@ spec:
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
       - name: IMAGE_APPEND_PLATFORM
         value: "true"
+      - name: BUILDAH_FORMAT
+        value: docker
       runAfter:
       - prefetch-dependencies
       taskRef:
@@ -115,7 +117,7 @@ spec:
         - name: name
           value: buildah-remote-oci-ta
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-buildah-remote-oci-ta:0.4@sha256:68a4491169a193c1ae92cbf78cc6ff4ba57b8aeffc48846da09c5cc674a1a7fe
+          value: quay.io/arewm/buildah-remote-oci-ta:docker-manifest-support@sha256:ff4fc12e366fe2db842e130e23e7674ef43cad6cf2e7c337ba01ccfe4f355e0a
         - name: kind
           value: task
         resolver: bundles
@@ -137,6 +139,8 @@ spec:
       - name: IMAGES
         value:
         - $(tasks.build-images.results.IMAGE_REF[*])
+      - name: BUILDAH_FORMAT
+        value: docker
       runAfter:
       - build-images
       taskRef:
@@ -144,7 +148,7 @@ spec:
         - name: name
           value: build-image-index
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:0c2270d1b24fcbaa6fe82b6d045b715a5f24f55d099a10f65297671e2ee421e6
+          value: quay.io/arewm/build-image-index:docker-manifest-support@sha256:0aaf06696bd9a7f0d49e56cd4df136938e9b0e17bd0619bb0dcc463b5763aef1
         - name: kind
           value: task
         resolver: bundles
@@ -423,7 +427,7 @@ spec:
         - name: name
           value: show-sbom
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:945a7c9066d3e0a95d3fddb7e8a6992e4d632a2a75d8f3a9bd2ff2fef0ec9aa0
+          value: quay.io/arewm/show-sbom:docker-manifest-support@sha256:c8d27a248d3bce1338c5161912a69ec15e9623186c31252dbf6f8d6f56adf2bc
         - name: kind
           value: task
         resolver: bundles

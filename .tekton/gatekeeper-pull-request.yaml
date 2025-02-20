@@ -39,7 +39,7 @@ spec:
   - name: build-platforms
     value:
       - localhost
-      - linux/arm64
+      # - linux/arm64
   #     - linux/ppc64le
   #     - linux/s390x
   pipelineRef:
