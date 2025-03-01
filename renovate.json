@@ -2,6 +2,7 @@
     "extends": [
         "github>konflux-ci/mintmaker//config/renovate/renovate.json"
     ],
+    "automerge": true,
     "ignorePaths": ["drift-cache"],
     "ignoreDeps": [
         "registry.redhat.io/openshift4/ose-operator-registry",
