@@ -7,14 +7,10 @@ metadata:
     build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    # when adding filter for directory use "directory/***".pathChanged()
-    # when adding filter for git submodule use "submodule".pathChanged()
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch == "main" &&
-      (".tekton/multi-arch-build-pipeline.yaml".pathChanged() ||
-      ".tekton/gatekeeper-operator-pull-request.yaml".pathChanged() ||
-      ".tekton/gatekeeper-operator-push.yaml".pathChanged() ||
-      "Containerfile.gatekeeper-operator".pathChanged() ||
-      "gatekeeper-operator".pathChanged())
+    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
+      == "main" && (".tekton/multi-arch-build-pipeline.yaml".pathChanged() || ".tekton/gatekeeper-operator-pull-request.yaml".pathChanged()
+      || ".tekton/gatekeeper-operator-push.yaml".pathChanged() || "Containerfile.gatekeeper-operator".pathChanged()
+      || "gatekeeper-operator".pathChanged())
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: olm-operator
@@ -38,14 +34,14 @@ spec:
     value: .
   - name: build-platforms
     value:
-      - localhost
-      - linux/arm64
-  #     - linux/ppc64le
-  #     - linux/s390x
+    - localhost
+    - linux/arm64
   pipelineRef:
     name: build-pipeline
-  taskRunTemplate: {}
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-gatekeeper-operator
   workspaces:
   - name: git-auth
     secret:
       secretName: '{{ git_auth_secret }}'
+status: {}
