@@ -1,5 +1,5 @@
 # Based on ./gatekeeper/Dockerfile
-FROM registry.access.redhat.com/ubi9/go-toolset:9.6-1745588370 as builder
+FROM registry.access.redhat.com/ubi9/go-toolset:9.6-1747333074 as builder
 USER 0
 COPY drift-detection/detector.sh /detector.sh
 # Check to see if we need to react to any uptream changes
