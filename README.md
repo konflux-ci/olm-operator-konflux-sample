@@ -14,4 +14,4 @@ Building OLM operators involves many different components that are inter-connect
 
 Konflux offers many different features and functionality. While this sample will not explore all of the features, there are many different techniques that will be demonstrated. We will aim to clearly describe these in [demonstrated functionality docs](docs/functionality-demonstrated.md).
 
-## Hello
+## Hello World
