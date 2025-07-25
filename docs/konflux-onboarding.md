@@ -84,6 +84,8 @@ $ opm alpha convert-template basic ./catalog-migrate/gatekeeper-operator/catalog
 The resulting `catalog-template.json` is a simplified version of a FBC which should be easier to maintain.
 
 In order to render the actual catalog from the template, you should use `opm` as well. 
+This step can be performed directly within the `fbc-builder` pipeline by configuring the run-opm-command task.
+As described in [konflux-building-catalog.md](konflux-building-catalog.md)
 
 NOTE: Starting with OCP 4.17 you need the `--migrate-level=bundle-object-to-csv-metadata` flag. For rendering to older versions of OCP, simply omit the flag.
 

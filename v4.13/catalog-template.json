@@ -97,7 +97,7 @@
         },
         {
             "schema": "olm.bundle",
-            "image": "quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator-bundle:d5fb5100da6049bad5ddaa1362662f30cf5112d9"
+            "image": "yet-to-be-released-example.com/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator-bundle:d5fb5100da6049bad5ddaa1362662f30cf5112d9"
         }
     ]
 }
