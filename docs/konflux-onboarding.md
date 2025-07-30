@@ -85,6 +85,8 @@ The resulting `catalog-template.json` is a simplified version of a FBC which sho
 
 In order to render the actual catalog from the template, you should use `opm` as well. 
 
+**NOTE** Always use digests when referencing bundle images in FBC templates to avoid Konflux pipeline failures.
+
 NOTE: Starting with OCP 4.17 you need the `--migrate-level=bundle-object-to-csv-metadata` flag. For rendering to older versions of OCP, simply omit the flag.
 
 ```bash
