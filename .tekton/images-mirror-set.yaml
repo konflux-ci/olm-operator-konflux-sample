@@ -1,0 +1,10 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageDigestMirrorSet
+metadata:
+  name: olm-operator-example
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - yet-to-be-released-example.com/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator-bundle
+    source: quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator-bundle
