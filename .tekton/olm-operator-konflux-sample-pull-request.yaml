@@ -683,6 +683,7 @@ spec:
         values:
         - "false"
     - name: test-task-2
+      displayName: "no-op task"
       params:
       - name: env-type
         value: "development"
