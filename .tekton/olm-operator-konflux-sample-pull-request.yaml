@@ -655,9 +655,6 @@ spec:
         - name: platform
           value:
           - $(params.build-platforms)
-      params:
-      - name: image-url
-        value: $(tasks.build-image-index.results.IMAGE_URL)
       runAfter:
       - clone-repository
       taskSpec:
@@ -666,8 +663,6 @@ spec:
           type: string
         - name: platform
           type: string
-        - name: image-url
-          type: string
         steps:
         - name: echo-parameters
           image: registry.access.redhat.com/ubi9/ubi-minimal:latest
@@ -675,7 +670,6 @@ spec:
             #!/bin/bash
             echo "Running validation for environment: $(params.env-type)"
             echo "Platform: $(params.platform)"
-            echo "Image URL: $(params.image-url)"
             echo "Validation completed successfully"
       when:
       - input: $(params.skip-checks)
@@ -689,8 +683,6 @@ spec:
         value: "development"
       - name: platform
         value: "nada"
-      - name: image-url
-        value: $(tasks.build-image-index.results.IMAGE_URL)
       runAfter:
       - prefetch-dependencies
       taskSpec:
@@ -699,8 +691,6 @@ spec:
           type: string
         - name: platform
           type: string
-        - name: image-url
-          type: string
         steps:
         - name: echo-parameters
           image: registry.access.redhat.com/ubi9/ubi-minimal:latest
@@ -708,13 +698,7 @@ spec:
             #!/bin/bash
             echo "Running validation for environment: $(params.env-type)"
             echo "Platform: $(params.platform)"
-            echo "Image URL: $(params.image-url)"
             echo "Validation completed successfully"
-      when:
-      - input: $(params.skip-checks)
-        operator: in
-        values:
-        - "false"
     workspaces:
     - name: git-auth
       optional: true
