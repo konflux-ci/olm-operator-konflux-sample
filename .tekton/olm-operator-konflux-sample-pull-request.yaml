@@ -605,6 +605,45 @@ spec:
         operator: in
         values:
         - "false"
+    - name: custom-env-validation
+      displayName: "Matrix: $(params.env-type) on $(params.platform)"
+      matrix:
+        params:
+        - name: env-type
+          value:
+          - development
+          - staging
+          - production
+        - name: platform
+          value:
+          - $(params.build-platforms)
+      params:
+      - name: image-url
+        value: $(tasks.build-image-index.results.IMAGE_URL)
+      runAfter:
+      - build-image-index
+      taskSpec:
+        params:
+        - name: env-type
+          type: string
+        - name: platform
+          type: string
+        - name: image-url
+          type: string
+        steps:
+        - name: echo-parameters
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          script: |
+            #!/bin/bash
+            echo "Running validation for environment: $(params.env-type)"
+            echo "Platform: $(params.platform)"
+            echo "Image URL: $(params.image-url)"
+            echo "Validation completed successfully"
+      when:
+      - input: $(params.skip-checks)
+        operator: in
+        values:
+        - "false"
     workspaces:
     - name: git-auth
       optional: true
