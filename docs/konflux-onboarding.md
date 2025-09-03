@@ -84,6 +84,8 @@ $ opm alpha convert-template basic ./catalog-migrate/gatekeeper-operator/catalog
 The resulting `catalog-template.json` is a simplified version of a FBC which should be easier to maintain.
 
 In order to render the actual catalog from the template, you should use `opm` as well. 
+This step can be performed directly within the `fbc-builder` pipeline by configuring the run-opm-command task.
+As described in [konflux-building-catalog.md](konflux-building-catalog.md)
 
 **NOTE** Always use digests when referencing bundle images in FBC templates to avoid Konflux pipeline failures.
 
