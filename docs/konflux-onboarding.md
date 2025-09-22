@@ -143,7 +143,7 @@ A sample PR for these changes can be found in https://github.com/konflux-ci/olm-
 
 ### Using private repos for built FBC fragments
 
-FBC fragments are stored in the `redhat-user-workloads` Quay namespace by default. The visibility of the Quay repo can be private as long as you are using the default namespace. If you decide to push them outside of this organization, it is mandatory for the repo to be **public** at the time of the release.
+FBC fragments are stored in the `redhat-user-workloads` Quay organization by default. The visibility of the Quay repo can be private as long as you are using this default organization. If you decide to push them into your own organization, it is mandatory for the repo to be **public** at the time of the release.
 
 ## Enable drift detection (optional)
 
