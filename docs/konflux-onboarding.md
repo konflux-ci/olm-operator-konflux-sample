@@ -141,6 +141,10 @@ If you plan to use your catalogs on multiple cluster architectures, you will nee
 
 A sample PR for these changes can be found in https://github.com/konflux-ci/olm-operator-konflux-sample/pull/65.
 
+### Using private repos for built FBC fragments
+
+FBC fragments are stored in the `redhat-user-workloads` Quay organization by default. The visibility of the Quay repo can be private as long as you are using this default organization. If you decide to push them into your own organization, it is mandatory for the repo to be **public** at the time of the release.
+
 ## Enable drift detection (optional)
 
 In this repository, we chose to maintain dedicated Containerfiles locally instead of using the ones inside the submodules. While this allows us to have complete control over the build process, it does lead to the possibility of upstream repositories changing their build process without making appropriate changes in our repository. This risk can be mitigated by detecting (and failing on) within the submodules.
