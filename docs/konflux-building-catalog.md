@@ -22,7 +22,7 @@ For the `run-opm-command` task, you must set the following parameters: `OPM_ARGS
 - name: IDMS_PATH
   value: ".tekton/images-mirror-set.yaml"
 - name: FILE_TO_UPDATE_PULLSPEC
-  value: "v4.13/catalog-template.json"
+  value: "v4.13/catalog/gatekeeper-operator/catalog.json"
 ```
 
 Note: For OCP version >= v4.17 you have to add `--migrate-level=bundle-object-to-csv-metadata` as well.  
@@ -40,7 +40,29 @@ Example for OCP >= v4.17:
 - name: IDMS_PATH
   value: ".tekton/images-mirror-set.yaml"
 - name: FILE_TO_UPDATE_PULLSPEC
-  value: "v4.18/catalog-template.json"
+  value: "v4.13/catalog/gatekeeper-operator/catalog.json"
+```
+
+Example of using `--migrate-level` parameter with `run-opm-command`.
+First, you need to create a parameter under `spec.params`:
+```yaml
+  params:
+    name: opm-args
+    description: Additional OPM arguments (e.g., ["--migrate-level=bundle-object-to-csv-metadata"] for v4.17+)
+    type: array
+    default: []
+```
+
+This parameter can then be used in `OPM_ARGS` as follows: 
+```yaml
+
+- name: OPM_ARGS
+  value:
+  - alpha
+  - render-template
+  - basic
+  - catalog/$(params.catalog).yaml
+  - $(params.opm-args[*])
 ```
 
 **Description of variables:**
@@ -49,7 +71,7 @@ Example for OCP >= v4.17:
 - `OPM_OUTPUT_PATH`: The path where the output from `opm` will be stored (i.e., where `catalog.json` will be saved).
   - Note: This task supports only the JSON format for catalog generation.
 - `IDMS_PATH`: The path to the ImageDigestMirrorSet file in YAML format.
-- `FILE_TO_UPDATE_PULLSPEC`: Relative path to a file (e.g., catalog-template.yml) in which pullspecs should be updated.
+- `FILE_TO_UPDATE_PULLSPEC`: Relative path to a file (e.g., `catalog.json`) in which pullspecs should be updated.
 
 Examples of complete `fbc-builder` pipeline configurations can be found in [PR#132](https://github.com/konflux-ci/olm-operator-konflux-sample/pull/132):
 
