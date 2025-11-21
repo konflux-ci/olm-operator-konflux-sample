@@ -1,0 +1,199 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/konflux-ci/olm-operator-konflux-sample?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch == "main" && "v4.13".pathChanged()
+  labels:
+    appstudio.openshift.io/application: gatekeeper
+    appstudio.openshift.io/component: gatekeeper-fbc-v413
+    pipelines.appstudio.openshift.io/type: build
+  name: gatekeeper-fbc-v413-on-pull-request
+  namespace: konflux-samples-tenant
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: output-image
+    value: quay.io/redhat-user-workloads/konflux-samples-tenant/gatekeeper-fbc-v413/gatekeeper-fbc-v413:{{revision}}
+  - name: build-platforms
+    value:
+    - linux/amd64
+  - name: dockerfile
+    value: v4.13/Containerfile.catalog
+  - name: path-context
+    value: .
+  pipelineSpec:
+    description: |
+      This pipeline is ideal for building and verifying [file-based catalogs](https://konflux-ci.dev/docs/advanced-how-tos/building-olm.adoc#building-the-file-based-catalog).
+    finally:
+    - name: show-sbom
+      params:
+      - name: IMAGE_URL
+        value: $(tasks.build-image-index.results.IMAGE_URL)
+      taskRef:
+        bundle: quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:1b1df4da95966d08ac6a5b8198710e09e68b5c2cdc707c37d9d19769e65884b2
+        kind: task
+        name: show-sbom
+    params:
+    - description: Source Repository URL
+      name: git-url
+      type: string
+    - default: ""
+      description: Revision of the Source Repository
+      name: revision
+      type: string
+    - description: Fully Qualified Output Image
+      name: output-image
+      type: string
+    - default: .
+      description: Path to the source code of an application's component from where to build image.
+      name: path-context
+      type: string
+    - default: Dockerfile
+      description: Path to the Dockerfile inside the context specified by parameter path-context
+      name: dockerfile
+      type: string
+    - default: "false"
+      description: Skip checks against built image
+      name: skip-checks
+      type: string
+    - default:
+      - linux/amd64
+      description: List of platforms to build the container images on.
+      name: build-platforms
+      type: array
+    results:
+    - description: ""
+      name: IMAGE_URL
+      value: $(tasks.build-image-index.results.IMAGE_URL)
+    - description: ""
+      name: IMAGE_DIGEST
+      value: $(tasks.build-image-index.results.IMAGE_DIGEST)
+    - description: ""
+      name: CHAINS-GIT_URL
+      value: $(tasks.clone-repository.results.url)
+    - description: ""
+      name: CHAINS-GIT_COMMIT
+      value: $(tasks.clone-repository.results.commit)
+    tasks:
+    - name: init
+      params:
+      - name: skip-checks
+        value: $(params.skip-checks)
+      taskRef:
+        bundle: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:66e90d31e1386bf516fb548cd3e3f0082b5d0234b8b90dbf9e0d4684b70dbe1a
+        kind: task
+        name: init
+    - name: clone-repository
+      params:
+      - name: url
+        value: $(params.git-url)
+      - name: revision
+        value: $(params.revision)
+      runAfter:
+      - init
+      taskRef:
+        bundle: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.2@sha256:217a86f7c87c0675ad2703138384242610d1964f029a8a6549abb86f5195b2c7
+        kind: task
+        name: git-clone
+      workspaces:
+      - name: basic-auth
+        workspace: git-auth
+      - name: output
+        workspace: source
+    - name: run-opm-command
+      params:
+      - name: OPM_ARGS
+        value:
+        - alpha
+        - render-template
+        - basic
+        - v4.13/catalog-template.json
+      - name: OPM_OUTPUT_PATH
+        value: v4.13/catalog/gatekeeper-operator/catalog.json
+      runAfter:
+      - clone-repository
+      taskRef:
+        bundle: quay.io/konflux-ci/tekton-catalog/task-run-opm-command:0.1@sha256:8769a30a7d79b9e59d3d3a6639d677a28e9d3d62c2f740df64d1f2156886fbac
+        kind: task
+        name: run-opm-command
+      workspaces:
+      - name: source
+        workspace: source
+    - matrix:
+        params:
+        - name: PLATFORM
+          value:
+          - $(params.build-platforms)
+      name: build-images
+      params:
+      - name: IMAGE
+        value: $(params.output-image)
+      - name: DOCKERFILE
+        value: $(params.dockerfile)
+      - name: CONTEXT
+        value: $(params.path-context)
+      - name: IMAGE_APPEND_PLATFORM
+        value: "true"
+      runAfter:
+      - run-opm-command
+      taskRef:
+        bundle: quay.io/konflux-ci/tekton-catalog/task-buildah:0.3@sha256:23c9a5a542b6c20573e9112a2123f1101e4a1a5b1d441611e9f1601a0f5a43b3
+        kind: task
+        name: buildah
+      workspaces:
+      - name: source
+        workspace: source
+    - name: build-image-index
+      params:
+      - name: IMAGE
+        value: $(params.output-image)
+      - name: IMAGES
+        value:
+        - $(tasks.build-images.results.IMAGE_REF[*])
+      runAfter:
+      - build-images
+      taskRef:
+        bundle: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:846dc9975914f31380ec2712fdbac9df3b06c00a9cc7df678315a7f97145efc2
+        kind: task
+        name: build-image-index
+    - name: validate-fbc
+      params:
+      - name: IMAGE_URL
+        value: $(tasks.build-image-index.results.IMAGE_URL)
+      - name: IMAGE_DIGEST
+        value: $(tasks.build-image-index.results.IMAGE_DIGEST)
+      runAfter:
+      - build-image-index
+      taskRef:
+        bundle: quay.io/konflux-ci/tekton-catalog/task-validate-fbc:0.1@sha256:cf1e41bc38f6e7ae7094b2a2501eedca374f7e1d8a4c49a2fd027c2a6277e1c0
+        kind: task
+        name: validate-fbc
+      when:
+      - input: $(params.skip-checks)
+        operator: in
+        values:
+        - "false"
+    workspaces:
+    - name: source
+    - name: git-auth
+      optional: true
+  workspaces:
+  - name: source
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+status: {}
