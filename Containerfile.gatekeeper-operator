@@ -6,11 +6,13 @@ COPY drift-detection/detector.sh /detector.sh
 # Check to see if we need to react to any uptream changes
 COPY drift-cache /drift-cache
 WORKDIR /tmp
-COPY gatekeeper-operator/Dockerfile .
+# gatekeeper-operator/Dockerfile is a symlink to build/Dockerfile upstream; compare the real file
+COPY gatekeeper-operator/build/Dockerfile .
 RUN /detector.sh ./Dockerfile /drift-cache/gatekeeper-operator/Dockerfile
 
-ENV LDFLAGS="-X ${VERSION_PKG}.gitVersion=v3.15.1-7 \
-             -X ${VERSION_PKG}.gitCommit=59587323ce32580b4dffba0a09b1ca22109925db \
+ENV VERSION_PKG="github.com/stolostron/gatekeeper-operator/pkg/version"
+ENV LDFLAGS="-X ${VERSION_PKG}.gitVersion=v3.21.0 \
+             -X ${VERSION_PKG}.gitCommit=873a9c7ef2c98fe8e9e7f9d5b99e4cd5c49cc00b \
              -X ${VERSION_PKG}.gitTreeState=clean \
              -X ${VERSION_PKG}.buildDate="
 
