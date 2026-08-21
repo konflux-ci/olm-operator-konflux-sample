@@ -8,7 +8,7 @@ WORKDIR /tmp
 COPY gatekeeper/Dockerfile .
 RUN /detector.sh ./Dockerfile /drift-cache/gatekeeper/Dockerfile
 
-ENV LDFLAGS="-X github.com/open-policy-agent/gatekeeper/v3/pkg/version.Version=v3.15.1" \
+ENV LDFLAGS="-X github.com/open-policy-agent/gatekeeper/v3/pkg/version.Version=v3.21.1" \
     GO111MODULE=on \
     CGO_ENABLED=1
 

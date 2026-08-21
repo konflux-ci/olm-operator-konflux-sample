@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM registry.ci.openshift.org/stolostron/builder:go1.21-linux as builder
+FROM registry.ci.openshift.org/stolostron/builder:go1.26-linux AS builder
 
 ARG GOOS
 ARG GOARCH
@@ -20,13 +20,25 @@ COPY controllers/ controllers/
 COPY pkg/ pkg/
 
 # Build
-RUN CGO_ENABLED=1 GOOS=${GOOS} GOARCH=${GOARCH} go build -a -ldflags "${LDFLAGS}" -o manager main.go
+RUN CGO_ENABLED=1 GOOS=${GOOS} GOARCH=${GOARCH} go build -mod=readonly -a -ldflags "${LDFLAGS}" -o manager main.go
 
-# Use distroless as minimal base image to package the manager binary
-# Refer to https://github.com/GoogleContainerTools/distroless for more details
+# Copy to base image
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 WORKDIR /
 COPY --from=builder /workspace/manager .
+RUN mkdir licenses/
+COPY LICENSE licenses/
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]
+
+LABEL name=gatekeeper/gatekeeper-rhel9-operator
+LABEL summary="Red Hat Gatekeeper Operator"
+LABEL description="The Gatekeeper Operator installs and configures Open Policy Agent Gatekeeper."
+LABEL version=v3.21.0
+LABEL maintainer="acm-component-maintainers@redhat.com"
+LABEL com.redhat.component=gatekeeper-operator-container
+LABEL io.openshift.tags="data,images"
+LABEL io.k8s.display-name="Gatekeeper Operator"
+LABEL io.k8s.description="The Gatekeeper Operator installs and configures Open Policy Agent Gatekeeper."
+LABEL cpe="cpe:/a:redhat:gatekeeper:3.21::el9"
