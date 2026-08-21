@@ -10,14 +10,19 @@ sed -i -e "s|quay.io/gatekeeper/gatekeeper:v.*|\"${GATEKEEPER_IMAGE_PULLSPEC}\"|
 	-e "s|quay.io/gatekeeper/gatekeeper-operator:v.*|\"${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC}\"|g" \
 	"${CSV_FILE}"
 
-export AMD64_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="amd64")')
-export ARM64_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="arm64")')
-export PPC64LE_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="ppc64le")')
-export S390X_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="s390x")')
+AMD64_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="amd64")')
+export AMD64_BUILT
+ARM64_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="arm64")')
+export ARM64_BUILT
+PPC64LE_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="ppc64le")')
+export PPC64LE_BUILT
+S390X_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="s390x")')
+export S390X_BUILT
 
-export EPOC_TIMESTAMP=$(date +%s)
+EPOC_TIMESTAMP=$(date +%s)
+export EPOC_TIMESTAMP
 # time for some direct modifications to the csv
-python3 - << CSV_UPDATE
+python3 - <<'CSV_UPDATE'
 import os
 from collections import OrderedDict
 from sys import exit as sys_exit
@@ -80,4 +85,4 @@ gatekeeper_csv['spec']['relatedImages'] = [
 dump_manifest(os.getenv('CSV_FILE'), gatekeeper_csv)
 CSV_UPDATE
 
-cat $CSV_FILE
+cat "${CSV_FILE}"
