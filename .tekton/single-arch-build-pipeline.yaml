@@ -33,11 +33,6 @@ spec:
         value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.5@sha256:437e4a29b0674420af96e497b6492d0408e59b97f98a35b84d2d32016503c2a0
       - name: kind
         value: task
-    when:
-    - input: "$(tasks.init.results.build)"
-      operator: in
-      values:
-      - 'true'
     runAfter:
     - init
     params:
@@ -89,11 +84,6 @@ spec:
         value: task
     runAfter:
     - clone-repository
-    when:
-    - input: "$(tasks.init.results.build)"
-      operator: in
-      values:
-      - 'true'
     params:
     - name: IMAGE
       value: "$(params.output-image)"
@@ -136,10 +126,6 @@ spec:
       - name: kind
         value: task
     when:
-    - input: "$(tasks.init.results.build)"
-      operator: in
-      values:
-      - 'true'
     - input: "$(params.build-source-image)"
       operator: in
       values:
