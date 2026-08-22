@@ -1,0 +1,28 @@
+---
+schema: olm.template.basic
+entries:
+  - schema: olm.package
+    name: gatekeeper-operator-product
+    defaultChannel: stable
+
+  - schema: olm.channel
+    name: stable
+    package: gatekeeper-operator-product
+    entries:
+      - name: gatekeeper-operator-product.v3.21.0
+        skipRange: "<3.21.0"
+
+  - schema: olm.channel
+    name: "3.21"
+    package: gatekeeper-operator-product
+    entries:
+      - name: gatekeeper-operator-product.v3.21.0
+        skipRange: "<3.21.0"
+
+  # This sample's own Konflux-built Gatekeeper Operator bundle (from the
+  # gatekeeper-operator-bundle component of the olm-operator application).
+  # The digest is kept current by the gatekeeper-operator-bundle ->
+  # gatekeeper-fbc-v422 Konflux nudge. Pin it to a built
+  # gatekeeper-operator-product v3.21.0 bundle before the first render.
+  - schema: olm.bundle
+    image: quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator-bundle@sha256:8befac62a335e63a237379b440f3c86d68250dd2992e24dd1c8908fab4ceca5e
