@@ -1,0 +1,16 @@
+---
+# Hadolint config for Konflux sample container builds.
+ignored:
+  - DL3002
+  - DL3003
+  - DL3007
+  - DL3013
+  - DL3040
+  - DL3041
+  - DL3042
+  - DL3045
+  - DL4006
+trustedRegistries:
+  - quay.io
+  - registry.access.redhat.com
+  - registry.redhat.io
