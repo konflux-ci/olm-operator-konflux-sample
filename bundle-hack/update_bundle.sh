@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:6455b863cdbc865daf6f1ed13a944b9a4617a30aeec62227cf586793f2539252"
+export GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:4b1397e8f5c8578b5bf5a262d6b61eee8701e1cdef387ff954c91fa0ce1aeeef"
 
 export GATEKEEPER_OPERATOR_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator@sha256:96914f38f2babd0333e4bba10007503cc1f4e7e638e696dd75700b2239af8657"
 
