@@ -24,7 +24,10 @@ spec:
     value: quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator-fbc-v422/gatekeeper-fbc-v422:{{revision}}
   - name: build-platforms
     value:
-    - linux/x86_64
+    - localhost
+    - linux/arm64
+    - linux/ppc64le
+    - linux/s390x
   - name: dockerfile
     value: Containerfile.catalog
   - name: path-context
