@@ -1,5 +1,7 @@
 # OLM operator Konflux sample
 
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/konflux-ci/olm-operator-konflux-sample/badge)](https://securityscorecards.dev/viewer/?uri=github.com/konflux-ci/olm-operator-konflux-sample)
+
 It is possible to [build Operator Lifecyle Manager (OLM) operators in Konflux](https://konflux-ci.dev/docs/advanced-how-tos/building-olm/). This repository is dedicated to demonstrating how to build operators with a simple example.
 
 ## Build sources
