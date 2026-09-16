@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 export GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:35bdd1f121b202716fd85fb07e56d03fc229c6e09df5809338a7d2372d12a98b"
 
@@ -10,14 +11,12 @@ sed -i -e "s|quay.io/gatekeeper/gatekeeper:v.*|\"${GATEKEEPER_IMAGE_PULLSPEC}\"|
 	-e "s|quay.io/gatekeeper/gatekeeper-operator:v.*|\"${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC}\"|g" \
 	"${CSV_FILE}"
 
-AMD64_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="amd64")')
-export AMD64_BUILT
-ARM64_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="arm64")')
-export ARM64_BUILT
-PPC64LE_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="ppc64le")')
-export PPC64LE_BUILT
-S390X_BUILT=$(skopeo inspect --raw docker://${GATEKEEPER_OPERATOR_IMAGE_PULLSPEC} | jq -e '.manifests[] | select(.platform.architecture=="s390x")')
-export S390X_BUILT
+# The supported architectures are declared statically based on the
+# build-platforms configured in the PipelineRun definitions.
+export AMD64_BUILT=true
+export ARM64_BUILT=true
+export PPC64LE_BUILT=true
+export S390X_BUILT=true
 
 EPOC_TIMESTAMP=$(date +%s)
 export EPOC_TIMESTAMP

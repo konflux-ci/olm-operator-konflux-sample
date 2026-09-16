@@ -38,7 +38,6 @@ RUN CGO_ENABLED=1 go build -a -ldflags "${LDFLAGS}$(date -u +'%Y-%m-%dT%H:%M:%SZ
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 WORKDIR /
 COPY --from=builder /workspace/manager .
-RUN microdnf -y update && microdnf -y clean all
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]
