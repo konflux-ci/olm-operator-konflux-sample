@@ -3,7 +3,7 @@ set -euo pipefail
 
 export GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:35bdd1f121b202716fd85fb07e56d03fc229c6e09df5809338a7d2372d12a98b"
 
-export GATEKEEPER_OPERATOR_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator@sha256:a289a7dd266aa1e7c521bb7ba20c8c907ef792f3bc4add1bdaa22def92daf206"
+export GATEKEEPER_OPERATOR_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator@sha256:cb52b271fc92311928f5102dd5d141dee207e9a42cdb750ccf942ae037ae7e2e"
 
 export CSV_FILE=/manifests/gatekeeper-operator-product.clusterserviceversion.yaml
 
