@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:35bdd1f121b202716fd85fb07e56d03fc229c6e09df5809338a7d2372d12a98b"
+export GATEKEEPER_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper@sha256:6e69e279c606f56990b00615dea5cdba3c00195a022cad23cb1ca95510cf2444"
 
 export GATEKEEPER_OPERATOR_IMAGE_PULLSPEC="quay.io/redhat-user-workloads/konflux-samples-tenant/olm-operator/gatekeeper-operator@sha256:a289a7dd266aa1e7c521bb7ba20c8c907ef792f3bc4add1bdaa22def92daf206"
 
